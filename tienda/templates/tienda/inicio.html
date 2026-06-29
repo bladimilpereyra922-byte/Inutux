@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inutux - Compras seguras y confiables</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #08090f; color: #fff; font-family: Arial, sans-serif; }
+        header { background: #0d1117; padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1db954; }
+        .logo { font-size: 28px; font-weight: 900; color: #00f5ff; }
+        .slogan { color: #1db954; font-size: 12px; letter-spacing: 2px; }
+        .productos { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; padding: 40px; }
+        .card { background: #0d1117; border: 1px solid #1a1a2e; border-radius: 12px; padding: 16px; transition: border-color 0.3s; }
+        .card:hover { border-color: #1db954; }
+        .card img { width: 100%; height: 160px; object-fit: cover; border-radius: 8px; }
+        .card h3 { margin-top: 12px; font-size: 16px; color: #fff; }
+        .card .precio { color: #1db954; font-size: 20px; font-weight: 700; margin-top: 8px; }
+        .card .proveedor { color: #4fc3f7; font-size: 12px; margin-top: 4px; }
+        .card a { display: block; margin-top: 12px; background: #1db954; color: #000; text-align: center; padding: 8px; border-radius: 8px; text-decoration: none; font-weight: 700; }
+        .sin-productos { text-align: center; padding: 80px; color: #4fc3f7; }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <div class="logo">INUTUX</div>
+            <div class="slogan">Compras seguras y confiables</div>
+        </div>
+        <div>
+            {% if user.is_authenticated %}
+            <span style="color:#4fc3f7;margin-right:16px">Hola, {{ user.username }}</span>
+            <a href="/logout/" style="background:#ff4444;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:700">Salir</a>
+            {% else %}
+            <a href="/login/" style="color:#4fc3f7;margin-right:16px;text-decoration:none">Iniciar sesion</a>
+            <a href="/registro/" style="background:#1db954;color:#000;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:700">Registrarse</a>
+            {% endif %}
+        </div>
+    </header>
+    {% if productos %}
+    <div class="productos">
+        {% for producto in productos %}
+        <div class="card">
+            {% if producto.imagen %}
+            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+            {% else %}
+            <div style="width:100%;height:160px;background:#1a1a2e;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#4fc3f7;">Sin imagen</div>
+            {% endif %}
+            <h3>{{ producto.nombre }}</h3>
+            <div class="precio">${{ producto.precio }}</div>
+            <div class="proveedor">Vendido por: {{ producto.proveedor.nombre_tienda }}</div>
+            <a href="/producto/{{ producto.pk }}/">Ver producto</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="sin-productos">
+        <h2>No hay productos disponibles aun</h2>
+    </div>
+    {% endif %}
+</body>
+</html>

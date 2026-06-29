@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Carrito - Inutux</title>
+    <style>
+        body{background:#08090f;color:#fff;font-family:Arial}
+        header{background:#0d1117;padding:16px 40px;border-bottom:1px solid #1db954;display:flex;justify-content:space-between;align-items:center}
+        .logo{font-size:28px;font-weight:900;color:#00f5ff}
+        .slogan{color:#1db954;font-size:12px}
+        .contenido{max-width:800px;margin:40px auto;padding:0 20px}
+        h2{margin-bottom:24px;color:#fff}
+        .item{background:#0d1117;border:1px solid #1a1a2e;border-radius:12px;padding:16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+        .item-nombre{font-size:16px;font-weight:700}
+        .item-precio{color:#1db954;font-size:18px;font-weight:700}
+        .btn-eliminar{background:#ff4444;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-size:14px}
+        .total{background:#0d1117;border:1px solid #1db954;border-radius:12px;padding:24px;text-align:right;margin-top:24px}
+        .total-precio{color:#1db954;font-size:28px;font-weight:900}
+        .btn-volver{color:#4fc3f7;text-decoration:none;display:inline-block;margin-bottom:24px}
+        .vacio{text-align:center;padding:80px;color:#4fc3f7}
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <div class="logo">INUTUX</div>
+            <div class="slogan">Compras seguras y confiables</div>
+        </div>
+        <a href="/" style="color:#4fc3f7;text-decoration:none">Volver a la tienda</a>
+    </header>
+    <div class="contenido">
+        <h2>Mi carrito</h2>
+        {% if carrito.items.all %}
+        {% for item in carrito.items.all %}
+        <div class="item">
+            <div>
+                <div class="item-nombre">{{ item.producto.nombre }}</div>
+                <div style="color:#aaa;font-size:14px">Cantidad: {{ item.cantidad }}</div>
+                <div style="color:#aaa;font-size:14px">Vendido por: {{ item.producto.proveedor.nombre_tienda }}</div>
+            </div>
+            <div style="text-align:right">
+                <div class="item-precio">${{ item.subtotal }}</div>
+                <a href="/carrito/eliminar/{{ item.pk }}/" class="btn-eliminar">Eliminar</a>
+            </div>
+        </div>
+        {% endfor %}
+        <div class="total">
+            <div style="color:#aaa;margin-bottom:8px">Total de tu compra</div>
+            <div class="total-precio">${{ carrito.total }}</div>
+        </div>
+        {% else %}
+        <div class="vacio">
+            <h2>Tu carrito esta vacio</h2>
+            <a href="/" style="color:#1db954">Ver productos</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

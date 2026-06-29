@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar sesion - Inutux</title>
+    <style>
+        body{background:#08090f;color:#fff;font-family:Arial;display:flex;justify-content:center;align-items:center;min-height:100vh}
+        .tarjeta{background:#0d1117;border:1px solid #1db954;border-radius:12px;padding:40px;width:400px}
+        .logo{font-size:28px;font-weight:900;color:#00f5ff;text-align:center;margin-bottom:8px}
+        .slogan{color:#1db954;font-size:12px;text-align:center;margin-bottom:24px}
+        h2{text-align:center;margin-bottom:24px}
+        label{display:block;color:#4fc3f7;margin-bottom:4px;font-size:14px}
+        input{width:100%;padding:10px;background:#1a1a2e;border:1px solid #333;border-radius:8px;color:#fff;margin-bottom:16px}
+        .boton{width:100%;background:#1db954;color:#000;padding:12px;border:none;border-radius:8px;font-weight:700;font-size:16px;cursor:pointer}
+        a{color:#4fc3f7;display:block;text-align:center;margin-top:16px}
+        .error{color:#ff4444;font-size:12px;margin-bottom:8px}
+    </style>
+</head>
+<body>
+    <div class="tarjeta">
+        <div class="logo">INUTUX</div>
+        <div class="slogan">Compras seguras y confiables</div>
+        <h2>Iniciar sesion</h2>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <label>{{ field.label }}</label>
+            {{ field }}
+            {% for error in field.errors %}
+            <div class="error">{{ error }}</div>
+            {% endfor %}
+            {% endfor %}
+            <button type="submit" class="boton">Entrar</button>
+        </form>
+        <a href="/registro/">No tienes cuenta? Registrate</a>
+    </div>
+</body>
+</html>
