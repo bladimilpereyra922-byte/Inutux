@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inutux - Compras seguras y confiables</title>
+
+    <form method="get" action="/" style="display:flex;gap:8px">
+            <input type="text" name="q" value="{{ busqueda }}" placeholder="Buscar productos..." style="padding:8px 16px;background:#1a1a2e;border:1px solid #1db954;border-radius:8px;color:#fff;width:250px">
+            <button type="submit" style="background:#1db954;color:#000;padding:8px 16px;border:none;border-radius:8px;font-weight:700;cursor:pointer">Buscar</button>
+        </form>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #08090f; color: #fff; font-family: Arial, sans-serif; }

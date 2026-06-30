@@ -3,12 +3,17 @@ from django.contrib.auth.decorators import login_required
 from .models import Producto, Categoria, Carrito, ItemCarrito
 
 def inicio(request):
+    busqueda = request.GET.get('q', '')
     productos = Producto.objects.filter(activo=True)
+    if busqueda:
+        productos = productos.filter(nombre__icontains=busqueda)
     categorias = Categoria.objects.all()
     return render(request, 'tienda/inicio.html', {
         'productos': productos,
-        'categorias': categorias
+        'categorias': categorias,
+        'busqueda': busqueda
     })
+    
 
 def detalle_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk, activo=True)
