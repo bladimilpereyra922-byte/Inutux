@@ -17,5 +17,7 @@ urlpatterns = [
     path('logout/', usuarios_views.logout_view, name='logout'),
     path('proveedor/', views.panel_proveedor, name='panel_proveedor'),
     path('proveedor/registro/', views.registro_proveedor, name='registro_proveedor'),
+    
+    # Metemos la ruta correctamente dentro de urlpatterns y apuntando a views.chat_soporte
+    path('soporte/', views.chat_soporte, name='chat_soporte'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-path('soporte/', views.chat_soporte, name='chat_soporte'),
