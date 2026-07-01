@@ -57,3 +57,18 @@ class ItemCarrito(models.Model):
 
     def subtotal(self):
         return self.cantidad * self.producto.precio
+
+class Reporte(models.Model):
+    ESTADOS = [
+        ('pendiente', 'Pendiente'),
+        ('revisado', 'Revisado'),
+        ('resuelto', 'Resuelto'),
+    ]
+    cliente = models.ForeignKey(User, on_delete=models.CASCADE)
+    proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE)
+    mensaje = models.TextField()
+    estado = models.CharField(max_length=20, choices=ESTADOS, default='pendiente')
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Reporte de {self.cliente.username} sobre {self.proveedor.nombre_tienda}'

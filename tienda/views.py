@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .models import Producto, Categoria, Carrito, ItemCarrito
+from .models import Producto, Categoria, Carrito, ItemCarrito, Proveedor
 
 def inicio(request):
     busqueda = request.GET.get('q', '')
@@ -13,7 +13,6 @@ def inicio(request):
         'categorias': categorias,
         'busqueda': busqueda
     })
-    
 
 def detalle_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk, activo=True)
@@ -41,3 +40,32 @@ def eliminar_carrito(request, pk):
     item = get_object_or_404(ItemCarrito, pk=pk, carrito__usuario=request.user)
     item.delete()
     return redirect('carrito')
+
+@login_required
+def panel_proveedor(request):
+    try:
+        proveedor = request.user.proveedor
+        if proveedor.estado != 'aprobado':
+            return render(request, 'tienda/pendiente.html')
+        productos = Producto.objects.filter(proveedor=proveedor)
+        return render(request, 'tienda/panel_proveedor.html', {
+            'proveedor': proveedor,
+            'productos': productos
+        })
+    except:
+        return redirect('registro_proveedor')
+
+@login_required
+def registro_proveedor(request):
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre_tienda')
+        descripcion = request.POST.get('descripcion')
+        telefono = request.POST.get('telefono')
+        Proveedor.objects.create(
+            usuario=request.user,
+            nombre_tienda=nombre,
+            descripcion=descripcion,
+            telefono=telefono
+        )
+        return redirect('panel_proveedor')
+    return render(request, 'tienda/registro_proveedor.html')

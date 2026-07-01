@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Proveedor - Inutux</title>
+    <style>
+        body{background:#08090f;color:#fff;font-family:Arial}
+        header{background:#0d1117;padding:16px 40px;border-bottom:1px solid #1db954;display:flex;justify-content:space-between;align-items:center}
+        .logo{font-size:28px;font-weight:900;color:#00f5ff}
+        .slogan{color:#1db954;font-size:12px}
+        .contenido{max-width:900px;margin:40px auto;padding:0 20px}
+        h2{margin-bottom:8px}
+        .estado{color:#1db954;font-size:14px;margin-bottom:32px}
+        .card{background:#0d1117;border:1px solid #1a1a2e;border-radius:12px;padding:16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+        .card h3{font-size:16px}
+        .precio{color:#1db954;font-weight:700}
+        .btn{background:#1db954;color:#000;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px}
+        .volver{color:#4fc3f7;text-decoration:none}
+        .sin-productos{text-align:center;padding:40px;color:#4fc3f7}
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <div class="logo">INUTUX</div>
+            <div class="slogan">Compras seguras y confiables</div>
+        </div>
+        <a href="/" class="volver">Volver a la tienda</a>
+    </header>
+    <div class="contenido">
+        <h2>Panel de {{ proveedor.nombre_tienda }}</h2>
+        <div class="estado">Estado: Aprobado</div>
+        {% if productos %}
+        {% for producto in productos %}
+        <div class="card">
+            <div>
+                <h3>{{ producto.nombre }}</h3>
+                <div class="precio">${{ producto.precio }}</div>
+                <div style="color:#aaa;font-size:14px">Stock: {{ producto.stock }}</div>
+            </div>
+            <div style="color:#1db954;font-weight:700">
+                {% if producto.activo %}Activo{% else %}Inactivo{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="sin-productos">
+            <h3>No tienes productos aun</h3>
+            <p style="color:#aaa">Contacta al administrador para agregar productos</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

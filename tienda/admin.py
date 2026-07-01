@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Proveedor, Categoria, Producto
+from .models import Proveedor, Categoria, Producto, Reporte
 
 @admin.register(Proveedor)
 class ProveedorAdmin(admin.ModelAdmin):
@@ -24,4 +24,16 @@ class ProductoAdmin(admin.ModelAdmin):
     list_display = ['nombre', 'proveedor', 'precio', 'stock', 'activo']
     list_filter = ['activo', 'categoria']
 
-# Register your models here.``
+@admin.register(Reporte)
+class ReporteAdmin(admin.ModelAdmin):
+    list_display = ['cliente', 'proveedor', 'estado', 'fecha']
+    list_filter = ['estado']
+    actions = ['marcar_revisado', 'marcar_resuelto']
+
+    def marcar_revisado(self, request, queryset):
+        queryset.update(estado='revisado')
+    marcar_revisado.short_description = 'Marcar como revisado'
+
+    def marcar_resuelto(self, request, queryset):
+        queryset.update(estado='resuelto')
+    marcar_resuelto.short_description = 'Marcar como resuelto'

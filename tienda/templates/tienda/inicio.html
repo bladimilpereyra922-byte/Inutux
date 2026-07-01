@@ -35,6 +35,8 @@
         <div>
             {% if user.is_authenticated %}
             <span style="color:#4fc3f7;margin-right:16px">Hola, {{ user.username }}</span>
+            <a href="/soporte/" style="color:#4fc3f7;margin-right:16px;text-decoration:none">Soporte</a>
+            <a href="/proveedor/" style="color:#1db954;margin-right:16px;text-decoration:none">Mi tienda</a>
             <a href="/logout/" style="background:#ff4444;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:700">Salir</a>
             {% else %}
             <a href="/login/" style="color:#4fc3f7;margin-right:16px;text-decoration:none">Iniciar sesion</a>
