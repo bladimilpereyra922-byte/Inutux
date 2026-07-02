@@ -1,4 +1,6 @@
 from pathlib import Path
+import dj_database_url
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -6,7 +8,7 @@ SECRET_KEY = 'django-insecure-nrp@c6mg#4dj92nf7_h)+lvhby96w960+x%k09k_a&vhun46nc
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['unitux.onrender.com', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['unitux.onrender.com', 'inutux.onrender.com', '127.0.0.1', 'localhost']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -53,12 +55,20 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'inutux.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if os.environ.get('DATABASE_URL'):
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
+            conn_max_age=600
+        )
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -87,23 +97,28 @@ CSRF_COOKIE_SECURE = False
 
 CORS_ALLOWED_ORIGINS = [
     'https://unitux.onrender.com',
+    'https://inutux.onrender.com',
     'http://127.0.0.1:8000',
     'http://localhost:8000',
 ]
-# Cache con Redis para aguantar miles de usuarios
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+
+if os.environ.get('REDIS_URL'):
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': os.environ.get('REDIS_URL'),
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            }
         }
     }
-}
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        }
+    }
 
-# Guardar sesiones en cache para mayor velocidad
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
-
-# Tiempo de cache en segundos (15 minutos)
 CACHE_MIDDLEWARE_SECONDS = 900
