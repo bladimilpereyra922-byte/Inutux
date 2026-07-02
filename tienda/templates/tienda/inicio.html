@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inutux - Compras seguras y confiables</title>
+    <title>Unitux - Compras seguras y confiables</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #08090f; color: #fff; font-family: Arial, sans-serif; }
@@ -11,13 +11,9 @@
         .header-brand { display: flex; flex-direction: column; }
         .logo { font-size: 28px; font-weight: 900; color: #00f5ff; text-decoration: none; }
         .slogan { color: #1db954; font-size: 12px; letter-spacing: 2px; }
-        
-        /* Buscador estilo Amazon centrado y expandido */
         .search-form { display: flex; flex-grow: 1; max-width: 500px; gap: 8px; margin: 0 20px; }
         .search-input { padding: 8px 16px; background: #1a1a2e; border: 1px solid #1db954; border-radius: 8px; color: #fff; width: 100%; outline: none; }
-        .search-button { background: #1db954; color: #000; padding: 8px 16px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
-        .search-button:hover { background: #00e676; }
-
+        .search-button { background: #1db954; color: #000; padding: 8px 16px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
         .nav-links { display: flex; align-items: center; }
         .productos { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; padding: 40px; }
         .card { background: #0d1117; border: 1px solid #1a1a2e; border-radius: 12px; padding: 16px; transition: border-color 0.3s; }
@@ -32,35 +28,26 @@
 </head>
 <body>
     <header>
-        <!-- Logo y eslogan de Inutux -->
         <div class="header-brand">
-            <a href="/" class="logo">INUTUX</a>
+            <a href="/" class="logo">UNITUX</a>
             <div class="slogan">Compras seguras y confiables</div>
         </div>
-
-        <!-- Buscador integrado en el Header -->
         <form method="get" action="/" class="search-form">
             <input type="text" name="q" value="{{ busqueda }}" placeholder="Buscar productos..." class="search-input">
             <button type="submit" class="search-button">Buscar</button>
         </form>
-
-        <!-- Enlaces de navegación -->
         <div class="nav-links">
             {% if user.is_authenticated %}
-                <span style="color:#4fc3f7;margin-right:16px">Hola, {{ user.username }}</span>
-                <!-- Aquí conectamos el nuevo chat de soporte de forma segura -->
-                <a href="{% url 'chat_soporte' %}" style="color:#1db954;margin-right:16px;text-decoration:none;font-weight:700;">🛠️ Soporte</a>
-                <a href="/proveedor/" style="color:#4fc3f7;margin-right:16px;text-decoration:none">Mi tienda</a>
-                <a href="/logout/" style="background:#ff4444;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:700">Salir</a>
+            <span style="color:#4fc3f7;margin-right:16px">Hola, {{ user.username }}</span>
+            <a href="{% url 'chat_soporte' %}" style="color:#1db954;margin-right:16px;text-decoration:none;font-weight:700">Soporte</a>
+            <a href="/proveedor/" style="color:#4fc3f7;margin-right:16px;text-decoration:none">Mi tienda</a>
+            <a href="/logout/" style="background:#ff4444;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:700">Salir</a>
             {% else %}
-                <!-- Si no está logueado, le ofrecemos soporte general también si lo deseas o lo dejas igual -->
-                <a href="/login/" style="color:#4fc3f7;margin-right:16px;text-decoration:none">Iniciar sesion</a>
-                <a href="/registro/" style="background:#1db954;color:#000;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:700">Registrarse</a>
+            <a href="/login/" style="color:#4fc3f7;margin-right:16px;text-decoration:none">Iniciar sesion</a>
+            <a href="/registro/" style="background:#1db954;color:#000;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:700">Registrarse</a>
             {% endif %}
         </div>
     </header>
-
-    <!-- Sección de Productos -->
     {% if productos %}
     <div class="productos">
         {% for producto in productos %}

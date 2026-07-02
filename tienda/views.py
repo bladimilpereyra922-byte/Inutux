@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .models import Producto, Categoria, Carrito, ItemCarrito, Proveedor
+from .models import Producto, Categoria, Carrito, ItemCarrito, Proveedor, Reporte
 
 def inicio(request):
     busqueda = request.GET.get('q', '')
@@ -69,3 +69,22 @@ def registro_proveedor(request):
         )
         return redirect('panel_proveedor')
     return render(request, 'tienda/registro_proveedor.html')
+
+@login_required
+def chat_soporte(request):
+    respuesta = None
+    if request.method == 'POST':
+        proveedor_id = request.POST.get('proveedor_id')
+        mensaje = request.POST.get('mensaje')
+        proveedor = get_object_or_404(Proveedor, pk=proveedor_id)
+        Reporte.objects.create(
+            cliente=request.user,
+            proveedor=proveedor,
+            mensaje=mensaje
+        )
+        respuesta = 'Gracias por tu reporte. Hemos recibido tu queja sobre ' + proveedor.nombre_tienda + ' y el equipo de Unitux la revisara pronto.'
+    proveedores = Proveedor.objects.filter(estado='aprobado')
+    return render(request, 'tienda/chat_soporte.html', {
+        'proveedores': proveedores,
+        'respuesta': respuesta
+    })
