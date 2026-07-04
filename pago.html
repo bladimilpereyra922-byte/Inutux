@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago - Unitux</title>
+    <style>
+        body{background:#08090f;color:#fff;font-family:Arial}
+        header{background:#0d1117;padding:16px 40px;border-bottom:1px solid #1db954;display:flex;justify-content:space-between;align-items:center}
+        .logo{font-size:28px;font-weight:900;color:#00f5ff}
+        .slogan{color:#1db954;font-size:12px}
+        .contenido{max-width:500px;margin:60px auto;padding:0 20px}
+        .tarjeta{background:#0d1117;border:1px solid #1db954;border-radius:12px;padding:32px;text-align:center}
+        h2{margin-bottom:16px}
+        .total{color:#1db954;font-size:32px;font-weight:900;margin-bottom:24px}
+        .resumen{color:#aaa;font-size:14px;margin-bottom:24px}
+        hr{border-color:#1a1a2e;margin-bottom:24px}
+        .volver{color:#4fc3f7;text-decoration:none;display:block;text-align:center;margin-top:24px}
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <div class="logo">UNITUX</div>
+            <div class="slogan">Compras seguras y confiables</div>
+        </div>
+    </header>
+    <div class="contenido">
+        <div class="tarjeta">
+            <h2>Completar pago</h2>
+            <div class="resumen">Total de tu compra</div>
+            <div class="total">${{ total }}</div>
+            <hr>
+            <div id="paypal-button-container"></div>
+        </div>
+        <a href="/carrito/" class="volver">← Volver al carrito</a>
+    </div>
+    <script src="https://www.paypal.com/sdk/js?client-id=AXyBX3HTV0tDrpBfh3XC8-aJzZMCFbhz6_7X6QBV4WTA0H5FFMEdpoeDD12kt3_9qOz9IpPDi7HWK2Tm&currency=USD"></script>
+    <script>
+        paypal.Buttons({
+            createOrder: function(data, actions) {
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: { value: '{{ total }}' }
+                    }]
+                });
+            },
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(details) {
+                    alert('Pago exitoso. Gracias ' + details.payer.name.given_name + '!');
+                    window.location.href = '/';
+                });
+            },
+            onError: function(err) {
+                console.error('Error en PayPal:', err);
+                alert('Hubo un error con el pago. Intenta de nuevo.');
+            }
+        }).render('#paypal-button-container');
+    </script>
+</body>
+</html>

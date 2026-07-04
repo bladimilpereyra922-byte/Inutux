@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Pago PayPal</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f9; margin: 0; }
+        .checkout-box { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; width: 350px; }
+    </style>
+</head>
+<body>
+
+    <div class="checkout-box">
+        <h2>Pasarela de Pago</h2>
+        <p>Monto a probar: <strong>$10.00 USD</strong></p>
+        <hr><br>
+        
+        <div id="paypal-button-container"></div>
+    </div>
+<script src="https://www.paypal.com/sdk/js?client-id=AXyBX3HTV0tDrpBfh3XC8-aJzZMCFbhz6_7X6QBV4WTA0H5FFMEdpoeDD12kt3_9qOz9IpPDi7HWK2Tm&currency=USD"></script>
+
+    <script>
+        paypal.Buttons({
+            createOrder: function(data, actions) {
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: { value: '10.00' }
+                    }]
+                });
+            },
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(details) {
+                    alert('¡Pago exitoso, ' + details.payer.name.given_name + '!');
+                    console.log(details);
+                });
+            },
+            onError: function(err) {
+                console.error('Error en PayPal:', err);
+            }
+        }).render('#paypal-button-container');
+    </script>
+
+</body>
+</html>

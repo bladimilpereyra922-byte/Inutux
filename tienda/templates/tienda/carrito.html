@@ -16,7 +16,7 @@
         .btn-eliminar{background:#ff4444;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-size:14px}
         .total{background:#0d1117;border:1px solid #1db954;border-radius:12px;padding:24px;text-align:right;margin-top:24px}
         .total-precio{color:#1db954;font-size:28px;font-weight:900}
-        .btn-volver{color:#4fc3f7;text-decoration:none;display:inline-block;margin-bottom:24px}
+        .btn-pago{display:block;background:#1db954;color:#000;text-align:center;padding:14px;border-radius:8px;text-decoration:none;font-weight:700;font-size:16px;margin-top:16px}
         .vacio{text-align:center;padding:80px;color:#4fc3f7}
     </style>
 </head>
@@ -47,6 +47,7 @@
         <div class="total">
             <div style="color:#aaa;margin-bottom:8px">Total de tu compra</div>
             <div class="total-precio">${{ carrito.total }}</div>
+            <a href="/pago/" class="btn-pago">Proceder al pago</a>
         </div>
         {% else %}
         <div class="vacio">

@@ -88,3 +88,9 @@ def chat_soporte(request):
         'proveedores': proveedores,
         'respuesta': respuesta
     })
+
+@login_required
+def pago(request):
+    carrito, creado = Carrito.objects.get_or_create(usuario=request.user)
+    total = carrito.total()
+    return render(request, 'tienda/pago.html', {'total': total})
