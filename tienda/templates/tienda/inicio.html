@@ -24,6 +24,7 @@
         .card .proveedor { color: #4fc3f7; font-size: 12px; margin-top: 4px; }
         .card a { display: block; margin-top: 12px; background: #1db954; color: #000; text-align: center; padding: 8px; border-radius: 8px; text-decoration: none; font-weight: 700; }
         .sin-productos { text-align: center; padding: 80px; color: #4fc3f7; }
+        .btn-google { background:#fff;color:#000;padding:8px 16px;border:none;border-radius:8px;font-weight:700;cursor:pointer;margin-right:8px }
     </style>
 </head>
 <body>
@@ -43,6 +44,7 @@
             <a href="/proveedor/" style="color:#4fc3f7;margin-right:16px;text-decoration:none">Mi tienda</a>
             <a href="/logout/" style="background:#ff4444;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:700">Salir</a>
             {% else %}
+            <button onclick="loginGoogle()" class="btn-google">Entrar con Google</button>
             <a href="/login/" style="color:#4fc3f7;margin-right:16px;text-decoration:none">Iniciar sesion</a>
             <a href="/registro/" style="background:#1db954;color:#000;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:700">Registrarse</a>
             {% endif %}
@@ -69,5 +71,48 @@
         <h2>No hay productos disponibles aun</h2>
     </div>
     {% endif %}
-</body>
-</html>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBRLwa4YsHq82L4tyKFPkQqUX__-as4BBo",
+    authDomain: "unitux-c7b8b.firebaseapp.com",
+    projectId: "unitux-c7b8b",
+    storageBucket: "unitux-c7b8b.firebasestorage.app",
+    messagingSenderId: "551444650101",
+    appId: "1:551444650101:web:c06c9f383c36ac2886c03c",
+    measurementId: "G-S7LD3HMF39"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+window.loginGoogle = function() {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        return result.user.getIdToken();
+      })
+      .then((token) => {
+        return fetch('/google-login/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.cookie.match(/csrftoken=([^;]+)/)[1]
+          },
+          body: JSON.stringify({token: token})
+        });
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          window.location.href = '/';
+        } else {
+          alert('Error al iniciar sesion: ' + data.error);
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  }

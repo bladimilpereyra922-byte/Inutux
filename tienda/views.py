@@ -1,6 +1,15 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.contrib.auth import login
+from django.http import JsonResponse
 from .models import Producto, Categoria, Carrito, ItemCarrito, Proveedor, Reporte
+import firebase_admin
+from firebase_admin import credentials, auth as firebase_auth
+
+if not firebase_admin._apps:
+    cred = credentials.Certificate('firebase-key.json')
+    firebase_admin.initialize_app(cred)
 
 def inicio(request):
     busqueda = request.GET.get('q', '')
@@ -94,3 +103,22 @@ def pago(request):
     carrito, creado = Carrito.objects.get_or_create(usuario=request.user)
     total = carrito.total()
     return render(request, 'tienda/pago.html', {'total': total})
+
+def google_login(request):
+    if request.method == 'POST':
+        import json
+        data = json.loads(request.body)
+        token = data.get('token')
+        try:
+            decoded = firebase_auth.verify_id_token(token)
+            email = decoded['email']
+            nombre = decoded.get('name', email.split('@')[0])
+            user, creado = User.objects.get_or_create(
+                email=email,
+                defaults={'username': email.split('@')[0]}
+            )
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False})

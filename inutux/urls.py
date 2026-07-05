@@ -5,6 +5,13 @@ from django.conf.urls.static import static
 from tienda import views
 from usuarios import views as usuarios_views
 
+from django.contrib import admin
+from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
+from tienda import views
+from usuarios import views as usuarios_views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.inicio, name='inicio'),
@@ -19,4 +26,5 @@ urlpatterns = [
     path('proveedor/registro/', views.registro_proveedor, name='registro_proveedor'),
     path('soporte/', views.chat_soporte, name='chat_soporte'),
     path('pago/', views.pago, name='pago'),
+    path('google-login/', views.google_login, name='google_login'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
