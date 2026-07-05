@@ -6,9 +6,15 @@ from django.http import JsonResponse
 from .models import Producto, Categoria, Carrito, ItemCarrito, Proveedor, Reporte
 import firebase_admin
 from firebase_admin import credentials, auth as firebase_auth
+import os
+import json
 
 if not firebase_admin._apps:
-    cred = credentials.Certificate('firebase-key.json')
+    firebase_key = os.environ.get('FIREBASE_KEY')
+    if firebase_key:
+        cred = credentials.Certificate(json.loads(firebase_key))
+    else:
+        cred = credentials.Certificate('unitux-c7b8b-firebase-adminsdk-fbsvc-21553d0c90.json')
     firebase_admin.initialize_app(cred)
 
 def inicio(request):
@@ -17,17 +23,11 @@ def inicio(request):
     if busqueda:
         productos = productos.filter(nombre__icontains=busqueda)
     categorias = Categoria.objects.all()
-    return render(request, 'tienda/inicio.html', {
-        'productos': productos,
-        'categorias': categorias,
-        'busqueda': busqueda
-    })
+    return render(request, 'tienda/inicio.html', {'productos': productos, 'categorias': categorias, 'busqueda': busqueda})
 
 def detalle_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk, activo=True)
-    return render(request, 'tienda/detalle.html', {
-        'producto': producto
-    })
+    return render(request, 'tienda/detalle.html', {'producto': producto})
 
 @login_required
 def agregar_carrito(request, pk):
@@ -57,24 +57,18 @@ def panel_proveedor(request):
         if proveedor.estado != 'aprobado':
             return render(request, 'tienda/pendiente.html')
         productos = Producto.objects.filter(proveedor=proveedor)
-        return render(request, 'tienda/panel_proveedor.html', {
-            'proveedor': proveedor,
-            'productos': productos
-        })
+        return render(request, 'tienda/panel_proveedor.html', {'proveedor': proveedor, 'productos': productos})
     except:
         return redirect('registro_proveedor')
 
 @login_required
 def registro_proveedor(request):
     if request.method == 'POST':
-        nombre = request.POST.get('nombre_tienda')
-        descripcion = request.POST.get('descripcion')
-        telefono = request.POST.get('telefono')
         Proveedor.objects.create(
             usuario=request.user,
-            nombre_tienda=nombre,
-            descripcion=descripcion,
-            telefono=telefono
+            nombre_tienda=request.POST.get('nombre_tienda'),
+            descripcion=request.POST.get('descripcion'),
+            telefono=request.POST.get('telefono')
         )
         return redirect('panel_proveedor')
     return render(request, 'tienda/registro_proveedor.html')
@@ -83,40 +77,24 @@ def registro_proveedor(request):
 def chat_soporte(request):
     respuesta = None
     if request.method == 'POST':
-        proveedor_id = request.POST.get('proveedor_id')
-        mensaje = request.POST.get('mensaje')
-        proveedor = get_object_or_404(Proveedor, pk=proveedor_id)
-        Reporte.objects.create(
-            cliente=request.user,
-            proveedor=proveedor,
-            mensaje=mensaje
-        )
+        proveedor = get_object_or_404(Proveedor, pk=request.POST.get('proveedor_id'))
+        Reporte.objects.create(cliente=request.user, proveedor=proveedor, mensaje=request.POST.get('mensaje'))
         respuesta = 'Gracias por tu reporte. Hemos recibido tu queja sobre ' + proveedor.nombre_tienda + ' y el equipo de Unitux la revisara pronto.'
     proveedores = Proveedor.objects.filter(estado='aprobado')
-    return render(request, 'tienda/chat_soporte.html', {
-        'proveedores': proveedores,
-        'respuesta': respuesta
-    })
+    return render(request, 'tienda/chat_soporte.html', {'proveedores': proveedores, 'respuesta': respuesta})
 
 @login_required
 def pago(request):
     carrito, creado = Carrito.objects.get_or_create(usuario=request.user)
-    total = carrito.total()
-    return render(request, 'tienda/pago.html', {'total': total})
+    return render(request, 'tienda/pago.html', {'total': carrito.total()})
 
 def google_login(request):
     if request.method == 'POST':
-        import json
         data = json.loads(request.body)
-        token = data.get('token')
         try:
-            decoded = firebase_auth.verify_id_token(token)
+            decoded = firebase_auth.verify_id_token(data.get('token'))
             email = decoded['email']
-            nombre = decoded.get('name', email.split('@')[0])
-            user, creado = User.objects.get_or_create(
-                email=email,
-                defaults={'username': email.split('@')[0]}
-            )
+            user, creado = User.objects.get_or_create(email=email, defaults={'username': email.split('@')[0]})
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return JsonResponse({'success': True})
         except Exception as e:
