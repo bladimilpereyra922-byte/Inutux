@@ -19,7 +19,6 @@ if not firebase_admin._apps:
             cred_dict = json.loads(firebase_key)
             cred = credentials.Certificate(cred_dict)
         except Exception as e:
-            # Si hay un error de formato en la variable de entorno, esto evitará que colapse a ciegas
             raise ValueError(f"Error al procesar la variable FIREBASE_KEY: {e}")
     else:
         # Local: Si no existe la variable, busca el archivo físico
@@ -116,3 +115,4 @@ def google_login(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False})
+# Arreglo final forzado de errores
