@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Iniciar sesion - Inutux</title>
+    <title>Iniciar sesion - Unitux</title>
     <style>
         body{background:#08090f;color:#fff;font-family:Arial;display:flex;justify-content:center;align-items:center;min-height:100vh}
         .tarjeta{background:#0d1117;border:1px solid #1db954;border-radius:12px;padding:40px;width:400px}
@@ -15,19 +15,18 @@
         a{color:#4fc3f7;display:block;text-align:center;margin-top:16px}
         .error{color:#ff4444;font-size:12px;margin-bottom:8px}
         
-        /* Contenedor para alinear los botones de terceros */
         .botones-sociales {
             display: flex;
             flex-direction: column;
             gap: 12px;
             align-items: center;
-            margin-top: 10px;
+            margin-top: 12px;
         }
     </style>
 </head>
 <body>
     <div class="tarjeta">
-        <div class="logo">INUTUX</div>
+        <div class="logo">UNITUX</div>
         <div class="slogan">Compras seguras y confiables</div>
         <h2>Iniciar sesion</h2>
         
@@ -43,7 +42,7 @@
             <button type="submit" class="boton">Entrar</button>
         </form>
 
-        <hr style="margin: 24px 0; border: 0; border-top: 1px solid #333;">
+        <hr style="margin:24px 0;border:0;border-top:1px solid #333">
         <div style="text-align: center; color: #aaa; font-size: 14px; margin-bottom: 12px;">O inicia sesión con:</div>
         
         <div class="botones-sociales">
@@ -56,67 +55,78 @@
     </div>
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    
     <script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
 
     <script>
-      // --- LOGICA DE GOOGLE ---
+      // Función para procesar Google (Evita Fetch problemático y origen null)
       function handleCredentialResponse(response) {
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '/google_login/';
+        form.action = '/google_login/'; // Cambiado a la ruta correcta con guion abajo
+
+        // Inyectamos el CSRF token real de Django
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = '{{ csrf_token }}';
+        form.appendChild(csrfInput);
 
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = 'credential';
         input.value = response.credential;
-
         form.appendChild(input);
+
         document.body.appendChild(form);
         form.submit();
       }
 
-      // --- CONFIGURACIÓN AL CARGAR LA PÁGINA ---
-      window.onload = function () {
+      window.onload = function() {
         // Inicializar Google
         google.accounts.id.initialize({
-          client_id: "1001380630801-10r1g9og17k8kd8g8o25ocs34biats8m.apps.googleusercontent.com",
+          client_id: "1001380630801-10r1g9og17k8kd8o25ocs34biats8m.apps.googleusercontent.com",
           callback: handleCredentialResponse
         });
+        
         google.accounts.id.renderButton(
           document.getElementById("buttonDiv"),
-          { theme: "filled_dark", size: "large", text: "signin_with", width: "320" }
+          {theme: "filled_dark", size: "large", text: "signin_with", width: "320"}
         );
 
-        // Inicializar Apple (Usa parámetros provisionales de tu app)
+        // Inicializar Apple
         AppleID.auth.init({
-          clientId : 'com.inutux.marketplace.client', // ID del servicio que registres en Apple Developer
+          clientId : 'com.inutux.marketplace.client',
           scope : 'name email',
-          redirectURI : 'https://inutux.onrender.com/apple_login/', // Tu ruta exenta de CSRF en Render
+          redirectURI : 'https://inutux.onrender.com/apple_login/',
           state : 'origin:web',
-          usePopup : true // Abre ventana emergente segura para evitar problemas de origen nulo
+          usePopup : true
         });
       }
 
-      // Capturar la respuesta exitosa de Apple mediante la ventana emergente
+      // Evento para procesar Apple
       document.getElementById('appleid-signin').addEventListener('click', async () => {
           try {
               const data = await AppleID.auth.signIn();
-              // Al iniciar sesión con éxito, enviamos el token a Django vía POST nativo
               const form = document.createElement('form');
               form.method = 'POST';
               form.action = '/apple_login/';
+
+              const csrfInput = document.createElement('input');
+              csrfInput.type = 'hidden';
+              csrfInput.name = 'csrfmiddlewaretoken';
+              csrfInput.value = '{{ csrf_token }}';
+              form.appendChild(csrfInput);
 
               const inputToken = document.createElement('input');
               inputToken.type = 'hidden';
               inputToken.name = 'id_token';
               inputToken.value = data.authorization.id_token;
-
               form.appendChild(inputToken);
+
               document.body.appendChild(form);
               form.submit();
           } catch (error) {
-              console.error('Error con el Sign-In de Apple:', error);
+              console.error('Error con Apple Sign-In:', error);
           }
       });
     </script>
