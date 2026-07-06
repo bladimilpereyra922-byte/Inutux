@@ -92,10 +92,22 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# Permite que las cookies se envíen correctamente en respuestas de redirección externa (Google/Apple)
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
 
 CORS_ALLOWED_ORIGINS = [
+    'https://unitux.onrender.com',
+    'https://inutux.onrender.com',
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+]
+
+# --- CONFIGURACIÓN DE CONFIANZA PARA CSRF (GOOGLE Y APPLE) ---
+CSRF_TRUSTED_ORIGINS = [
     'https://unitux.onrender.com',
     'https://inutux.onrender.com',
     'http://127.0.0.1:8000',
