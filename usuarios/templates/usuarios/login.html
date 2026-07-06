@@ -42,37 +42,26 @@
         </div>
         <a href="/registro/">No tienes cuenta? Registrate</a>
     </div>
-
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
-      // Enviamos el token de Google usando un formulario nativo para evitar bloqueos de fetch
-      function handleCredentialResponse(response) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '/google-login/'; // Coincide con tu urls.py con guion medio
-
-        // Inyectamos el CSRF token de Django
-        const csrfInput = document.createElement('input');
-        csrfInput.type = 'hidden';
-        csrfInput.name = 'csrfmiddlewaretoken';
-        csrfInput.value = '{{ csrf_token }}';
-        form.appendChild(csrfInput);
-
-        // Pasamos la credencial que nos da Google
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'credential';
-        input.value = response.credential;
-        form.appendChild(input);
-
-        document.body.appendChild(form);
-        form.submit();
-      }
-
       window.onload = function() {
         google.accounts.id.initialize({
-          client_id: "551444650101-5opam7p1psqlu7ucc3k2d9ipvtak5ii3.apps.googleusercontent.com", // Tu ID real verificado
-          callback: handleCredentialResponse
+          client_id: "551444650101-5opam7p1psqlu7ucc3k2d9ipvtak5ii3.apps.googleusercontent.com",
+          callback: function(response) {
+            fetch('/google-login/', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+              },
+              body: JSON.stringify({token: response.credential})
+            })
+            .then(r => r.json())
+            .then(data => {
+              if(data.success) window.location.href = '/';
+              else alert('Error: ' + data.error);
+            });
+          }
         });
         google.accounts.id.renderButton(
           document.getElementById("buttonDiv"),
