@@ -102,7 +102,6 @@ def chat_soporte(request):
 def pago(request):
     carrito, creado = Carrito.objects.get_or_create(usuario=request.user)
     return render(request, 'tienda/pago.html', {'total': carrito.total()})
-
 def google_login(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -115,4 +114,3 @@ def google_login(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False})
-# Arreglo final forzado de errores
