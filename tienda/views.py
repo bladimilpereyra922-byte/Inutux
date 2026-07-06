@@ -62,6 +62,7 @@ def ver_carrito(request):
 
 @login_required
 def eliminar_carrito(request, pk):
+    item = get_object_or_404(ItemCarrito, pk=pk, Pattern=request.user) # Corregido para usar la relación directa si aplica, o mediante el filtro correcto:
     item = get_object_or_404(ItemCarrito, pk=pk, carrito__usuario=request.user)
     item.delete()
     return redirect('carrito')
