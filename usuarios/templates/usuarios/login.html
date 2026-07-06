@@ -14,14 +14,8 @@
         .boton{width:100%;background:#1db954;color:#000;padding:12px;border:none;border-radius:8px;font-weight:700;font-size:16px;cursor:pointer}
         a{color:#4fc3f7;display:block;text-align:center;margin-top:16px}
         .error{color:#ff4444;font-size:12px;margin-bottom:8px}
-        
-        .botones-sociales {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            align-items: center;
-            margin-top: 12px;
-        }
+        .botones-sociales{display:flex;flex-direction:column;gap:12px;align-items:center;margin-top:12px}
+        .btn-apple{width:320px;height:40px;background:#000;color:#fff;border:1px solid #333;border-radius:8px;cursor:not-allowed;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;opacity:0.5}
     </style>
 </head>
 <body>
@@ -29,7 +23,6 @@
         <div class="logo">UNITUX</div>
         <div class="slogan">Compras seguras y confiables</div>
         <h2>Iniciar sesion</h2>
-        
         <form method="post">
             {% csrf_token %}
             {% for field in form %}
@@ -41,34 +34,31 @@
             {% endfor %}
             <button type="submit" class="boton">Entrar</button>
         </form>
-
         <hr style="margin:24px 0;border:0;border-top:1px solid #333">
-        <div style="text-align: center; color: #aaa; font-size: 14px; margin-bottom: 12px;">O inicia sesión con:</div>
-        
+        <div style="text-align:center;color:#aaa;font-size:14px;margin-bottom:12px">O inicia sesion con:</div>
         <div class="botones-sociales">
             <div id="buttonDiv"></div>
-            <div id="appleid-signin" data-color="black" data-border="true" data-type="sign-in" style="width: 320px; height: 40px; cursor: pointer;"></div>
+            <div class="btn-apple" title="Proximamente">🍎 Continuar con Apple (Proximamente)</div>
         </div>
-
         <a href="/registro/">No tienes cuenta? Registrate</a>
     </div>
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
-
     <script>
-      // Función para procesar Google
+      // Enviamos el token de Google usando un formulario nativo para evitar bloqueos de fetch
       function handleCredentialResponse(response) {
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '/google-login/'; // <-- Cambiado a guion medio para que Django lo encuentre
+        form.action = '/google-login/'; // Coincide con tu urls.py con guion medio
 
+        // Inyectamos el CSRF token de Django
         const csrfInput = document.createElement('input');
         csrfInput.type = 'hidden';
         csrfInput.name = 'csrfmiddlewaretoken';
         csrfInput.value = '{{ csrf_token }}';
         form.appendChild(csrfInput);
 
+        // Pasamos la credencial que nos da Google
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = 'credential';
@@ -80,53 +70,15 @@
       }
 
       window.onload = function() {
-        // Inicializar Google
         google.accounts.id.initialize({
-          client_id: "1001380630801-10r1g9og17k8kd8o25ocs34biats8m.apps.googleusercontent.com",
+          client_id: "551444650101-5opam7p1psqlu7ucc3k2d9ipvtak5ii3.apps.googleusercontent.com", // Tu ID real verificado
           callback: handleCredentialResponse
         });
-        
         google.accounts.id.renderButton(
           document.getElementById("buttonDiv"),
           {theme: "filled_dark", size: "large", text: "signin_with", width: "320"}
         );
-
-        // Inicializar Apple
-        AppleID.auth.init({
-          clientId : 'com.inutux.marketplace.client',
-          scope : 'name email',
-          redirectURI : 'https://inutux.onrender.com/apple-login/', // <-- Cambiado a guion medio
-          state : 'origin:web',
-          usePopup : true
-        });
       }
-
-      // Evento para procesar Apple
-      document.getElementById('appleid-signin').addEventListener('click', async () => {
-          try {
-              const data = await AppleID.auth.signIn();
-              const form = document.createElement('form');
-              form.method = 'POST';
-              form.action = '/apple-login/'; // <-- Cambiado a guion medio
-
-              const csrfInput = document.createElement('input');
-              csrfInput.type = 'hidden';
-              csrfInput.name = 'csrfmiddlewaretoken';
-              csrfInput.value = '{{ csrf_token }}';
-              form.appendChild(csrfInput);
-
-              const inputToken = document.createElement('input');
-              inputToken.type = 'hidden';
-              inputToken.name = 'id_token';
-              inputToken.value = data.authorization.id_token;
-              form.appendChild(inputToken);
-
-              document.body.appendChild(form);
-              form.submit();
-          } catch (error) {
-              console.error('Error con Apple Sign-In:', error);
-          }
-      });
     </script>
 </body>
 </html>
