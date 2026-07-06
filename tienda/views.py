@@ -9,12 +9,28 @@ from firebase_admin import credentials, auth as firebase_auth
 import os
 import json
 
+# Inicialización segura de Firebase Admin SDK para Render y Local
 if not firebase_admin._apps:
     firebase_key = os.environ.get('FIREBASE_KEY')
+    
     if firebase_key:
-        cred = credentials.Certificate(json.loads(firebase_key))
+        try:
+            # Render: Cargamos el JSON desde la variable de entorno
+            cred_dict = json.loads(firebase_key)
+            cred = credentials.Certificate(cred_dict)
+        except Exception as e:
+            # Si hay un error de formato en la variable de entorno, esto evitará que colapse a ciegas
+            raise ValueError(f"Error al procesar la variable FIREBASE_KEY: {e}")
     else:
-        cred = credentials.Certificate('unitux-c7b8b-firebase-adminsdk-fbsvc-21553d0c90.json')
+        # Local: Si no existe la variable, busca el archivo físico
+        ruta_local = 'unitux-c7b8b-firebase-adminsdk-fbsvc-21553d0c90.json'
+        if os.path.exists(ruta_local):
+            cred = credentials.Certificate(ruta_local)
+        elif os.path.exists('firebase-key.json'):
+            cred = credentials.Certificate('firebase-key.json')
+        else:
+            raise FileNotFoundError("No se encontró la variable FIREBASE_KEY ni el archivo JSON local de Firebase.")
+
     firebase_admin.initialize_app(cred)
 
 def inicio(request):
