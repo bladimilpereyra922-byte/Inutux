@@ -47,7 +47,6 @@
         
         <div class="botones-sociales">
             <div id="buttonDiv"></div>
-            
             <div id="appleid-signin" data-color="black" data-border="true" data-type="sign-in" style="width: 320px; height: 40px; cursor: pointer;"></div>
         </div>
 
@@ -58,13 +57,12 @@
     <script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
 
     <script>
-      // Función para procesar Google (Evita Fetch problemático y origen null)
+      // Función para procesar Google
       function handleCredentialResponse(response) {
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '/google_login/'; // Cambiado a la ruta correcta con guion abajo
+        form.action = '/google-login/'; // <-- Cambiado a guion medio para que Django lo encuentre
 
-        // Inyectamos el CSRF token real de Django
         const csrfInput = document.createElement('input');
         csrfInput.type = 'hidden';
         csrfInput.name = 'csrfmiddlewaretoken';
@@ -97,7 +95,7 @@
         AppleID.auth.init({
           clientId : 'com.inutux.marketplace.client',
           scope : 'name email',
-          redirectURI : 'https://inutux.onrender.com/apple_login/',
+          redirectURI : 'https://inutux.onrender.com/apple-login/', // <-- Cambiado a guion medio
           state : 'origin:web',
           usePopup : true
         });
@@ -109,7 +107,7 @@
               const data = await AppleID.auth.signIn();
               const form = document.createElement('form');
               form.method = 'POST';
-              form.action = '/apple_login/';
+              form.action = '/apple-login/'; // <-- Cambiado a guion medio
 
               const csrfInput = document.createElement('input');
               csrfInput.type = 'hidden';
