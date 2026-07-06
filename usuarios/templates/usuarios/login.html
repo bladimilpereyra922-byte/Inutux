@@ -14,6 +14,15 @@
         .boton{width:100%;background:#1db954;color:#000;padding:12px;border:none;border-radius:8px;font-weight:700;font-size:16px;cursor:pointer}
         a{color:#4fc3f7;display:block;text-align:center;margin-top:16px}
         .error{color:#ff4444;font-size:12px;margin-bottom:8px}
+        
+        /* Contenedor para alinear los botones de terceros */
+        .botones-sociales {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -36,18 +45,26 @@
 
         <hr style="margin: 24px 0; border: 0; border-top: 1px solid #333;">
         <div style="text-align: center; color: #aaa; font-size: 14px; margin-bottom: 12px;">O inicia sesión con:</div>
-        <div id="buttonDiv" style="display: flex; justify-content: center; margin-top: 10px;"></div>
+        
+        <div class="botones-sociales">
+            <div id="buttonDiv"></div>
+            
+            <div id="appleid-signin" data-color="black" data-border="true" data-type="sign-in" style="width: 320px; height: 40px; cursor: pointer;"></div>
+        </div>
 
         <a href="/registro/">No tienes cuenta? Registrate</a>
     </div>
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <script type="text/javascript" src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"></script>
+
     <script>
+      // --- LOGICA DE GOOGLE ---
       function handleCredentialResponse(response) {
-        // Creamos un formulario nativo en JS para saltarnos el bloqueo de origen 'null'
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '/google_login/'; // Ruta relativa compatible con Local y Render
+        form.action = '/google_login/';
 
         const input = document.createElement('input');
         input.type = 'hidden';
@@ -56,19 +73,52 @@
 
         form.appendChild(input);
         document.body.appendChild(form);
-        form.submit(); // Hace el envío limpio simulando una acción del usuario
+        form.submit();
       }
 
+      // --- CONFIGURACIÓN AL CARGAR LA PÁGINA ---
       window.onload = function () {
+        // Inicializar Google
         google.accounts.id.initialize({
           client_id: "1001380630801-10r1g9og17k8kd8g8o25ocs34biats8m.apps.googleusercontent.com",
-          callback: handleCredentialResponse // <-- Quitamos 'ux_mode: redirect' para usar el callback limpio
+          callback: handleCredentialResponse
         });
         google.accounts.id.renderButton(
           document.getElementById("buttonDiv"),
           { theme: "filled_dark", size: "large", text: "signin_with", width: "320" }
         );
+
+        // Inicializar Apple (Usa parámetros provisionales de tu app)
+        AppleID.auth.init({
+          clientId : 'com.inutux.marketplace.client', // ID del servicio que registres en Apple Developer
+          scope : 'name email',
+          redirectURI : 'https://inutux.onrender.com/apple_login/', // Tu ruta exenta de CSRF en Render
+          state : 'origin:web',
+          usePopup : true // Abre ventana emergente segura para evitar problemas de origen nulo
+        });
       }
+
+      // Capturar la respuesta exitosa de Apple mediante la ventana emergente
+      document.getElementById('appleid-signin').addEventListener('click', async () => {
+          try {
+              const data = await AppleID.auth.signIn();
+              // Al iniciar sesión con éxito, enviamos el token a Django vía POST nativo
+              const form = document.createElement('form');
+              form.method = 'POST';
+              form.action = '/apple_login/';
+
+              const inputToken = document.createElement('input');
+              inputToken.type = 'hidden';
+              inputToken.name = 'id_token';
+              inputToken.value = data.authorization.id_token;
+
+              form.appendChild(inputToken);
+              document.body.appendChild(form);
+              form.submit();
+          } catch (error) {
+              console.error('Error con el Sign-In de Apple:', error);
+          }
+      });
     </script>
 </body>
 </html>
