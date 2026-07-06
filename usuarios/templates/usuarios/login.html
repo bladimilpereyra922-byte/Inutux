@@ -64,9 +64,10 @@
         .catch(err => console.error('Error en la petición:', err));
       }
 
-      window.onload = function () {
+     window.onload = function () {
         google.accounts.id.initialize({
-          client_id: "1001380630801-10r1g9og17k8kd8g8o25ocs34biats8m.apps.googleusercontent.com", // <-- Recuerda poner tu ID real de la consola de Google aquí
+          client_id: "1001380630801-10r1g9og17k8kd8g8o25ocs34biats8m.apps.googleusercontent.com",
+          ux_mode: "redirect",
           callback: handleCredentialResponse
         });
         google.accounts.id.renderButton(
@@ -74,6 +75,7 @@
           { theme: "filled_dark", size: "large", text: "signin_with", width: "320" }
         );
       }
+      
     </script>
 </body>
 </html>
