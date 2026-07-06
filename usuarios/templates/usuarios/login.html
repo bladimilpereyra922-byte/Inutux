@@ -16,7 +16,6 @@
         .error{color:#ff4444;font-size:12px;margin-bottom:8px}
         .botones-sociales{display:flex;flex-direction:column;gap:12px;align-items:center;margin-top:12px}
         
-        /* Botón personalizado de Google para saltarnos el bloqueo de Javascript Origin */
         .btn-google-custom {
             width: 320px;
             height: 40px;
@@ -71,19 +70,17 @@
 
     <script>
       function oauthSignIn() {
-        // Extremo oficial de OAuth 2.0 que me pasaste en el documento
         var oauth2Endpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
-      
         var form = document.createElement('form');
         form.setAttribute('method', 'GET'); 
         form.setAttribute('action', oauth2Endpoint);
       
-        // Parámetros obligatorios del flujo que solicita el token de acceso
         var params = {
           'client_id': '551444650101-5opam7p1psqlu7ucc3k2d9ipvtak5ii3.apps.googleusercontent.com',
-          'redirect_uri': 'https://inutux.onrender.com/google-login/', // Tu redirección autorizada
+          // Apuntamos al login directamente para que Google lo acepte sin chistar
+          'redirect_uri': 'https://inutux.onrender.com/login/', 
           'response_type': 'token',
-          'scope': 'openid email profile', // Permisos básicos para autenticar al usuario
+          'scope': 'openid email profile',
           'include_granted_scopes': 'true',
           'state': 'pass-through-value'
         };
@@ -98,6 +95,36 @@
       
         document.body.appendChild(form);
         form.submit();
+      }
+
+      // Al regresar de Google, capturamos el token que viene en la URL y se lo mandamos a Django
+      window.onload = function() {
+        var fragmentString = location.hash.substring(1);
+        var params = {};
+        var regex = /([^&=]+)=([^&]*)/g, m;
+        while (m = regex.exec(fragmentString)) {
+          params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+        }
+        
+        // Si encontramos el token de Google en la URL, se lo enviamos a tu vista de Django por detrás
+        if (params['access_token']) {
+          fetch('/google-login/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ token: params['access_token'] })
+          })
+          .then(r => r.json())
+          .then(data => {
+            if (data.success) {
+              window.location.href = '/'; // Logueado con éxito, va al home
+            } else {
+              alert('Error en el login: ' + data.error);
+            }
+          });
+        }
       }
     </script>
 </body>
