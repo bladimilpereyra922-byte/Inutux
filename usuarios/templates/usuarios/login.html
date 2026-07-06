@@ -44,38 +44,31 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
       function handleCredentialResponse(response) {
-        // Enviamos el token de Google de forma segura a nuestra vista de Django
-        fetch('/google_login/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}'
-          },
-          body: JSON.stringify({ token: response.credential })
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            window.location.href = '/'; // Redirige al inicio si todo sale bien
-          } else {
-            alert('Error en la autenticación: ' + data.error);
-          }
-        })
-        .catch(err => console.error('Error en la petición:', err));
+        // Creamos un formulario nativo en JS para saltarnos el bloqueo de origen 'null'
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/google_login/'; // Ruta relativa compatible con Local y Render
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'credential';
+        input.value = response.credential;
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit(); // Hace el envío limpio simulando una acción del usuario
       }
 
-     window.onload = function () {
+      window.onload = function () {
         google.accounts.id.initialize({
           client_id: "1001380630801-10r1g9og17k8kd8g8o25ocs34biats8m.apps.googleusercontent.com",
-          ux_mode: "redirect",
-          callback: handleCredentialResponse
+          callback: handleCredentialResponse // <-- Quitamos 'ux_mode: redirect' para usar el callback limpio
         });
         google.accounts.id.renderButton(
           document.getElementById("buttonDiv"),
           { theme: "filled_dark", size: "large", text: "signin_with", width: "320" }
         );
       }
-      
     </script>
 </body>
 </html>
