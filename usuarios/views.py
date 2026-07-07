@@ -39,7 +39,7 @@ def google_login(request):
     codigo_google = request.GET.get('code')
     
     if not codigo_google:
-        return redirect('login')
+        redirect_uri = 'https://inutux.onrender.com/google-login/'
     
     # 2. Configura los datos. Nota cómo el Secreto ahora se lee de forma segura desde el sistema operativo
     client_id = '551444650101-5opam7p1psqlu7ucc3k2d9ipvtak5ii3.apps.googleusercontent.com'
