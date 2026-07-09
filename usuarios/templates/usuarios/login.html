@@ -34,8 +34,6 @@
             transition: background 0.2s;
         }
         .btn-google-custom:hover { background: #f1f1f1; }
-        
-        .btn-apple{width:320px;height:40px;background:#000;color:#fff;border:1px solid #333;border-radius:8px;cursor:not-allowed;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;opacity:0.5}
     </style>
 </head>
 <body>
@@ -62,8 +60,6 @@
                 <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/web-24dp/logo_googleg_24dp.png" alt="Google" width="18">
                 Continuar con Google
             </button>
-            
-            <div class="btn-apple" title="Proximamente">🍎 Continuar con Apple (Proximamente)</div>
         </div>
         <a href="/registro/">No tienes cuenta? Registrate</a>
     </div>
@@ -76,10 +72,9 @@
         form.setAttribute('action', oauth2Endpoint);
       
         var params = {
-          'client_id': '551444650101-5opam7p1psqlu7ucc3k2d9ipvtak5ii3.apps.googleusercontent.com',
-          // Apuntamos al login directamente para que Google lo acepte sin chistar
-          'redirect_uri': 'https://inutux.onrender.com/login/', 
-          'response_type': 'token',
+          'client_id': '1001380630801-h5nsvp8tm1b9dgv05cd49d0gq96u0kkf.apps.googleusercontent.com',
+          'redirect_uri': 'http://127.0.0.1:8000/google-login/', 
+          'response_type': 'code',
           'scope': 'openid email profile',
           'include_granted_scopes': 'true',
           'state': 'pass-through-value'
@@ -97,33 +92,12 @@
         form.submit();
       }
 
-      // Al regresar de Google, capturamos el token que viene en la URL y se lo mandamos a Django
       window.onload = function() {
-        var fragmentString = location.hash.substring(1);
-        var params = {};
-        var regex = /([^&=]+)=([^&]*)/g, m;
-        while (m = regex.exec(fragmentString)) {
-          params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
-        }
+        var urlParams = new URLSearchParams(window.location.search);
+        var code = urlParams.get('code');
         
-        // Si encontramos el token de Google en la URL, se lo enviamos a tu vista de Django por detrás
-        if (params['access_token']) {
-          fetch('/google-login/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({ token: params['access_token'] })
-          })
-          .then(r => r.json())
-          .then(data => {
-            if (data.success) {
-              window.location.href = '/'; // Logueado con éxito, va al home
-            } else {
-              alert('Error en el login: ' + data.error);
-            }
-          });
+        if (code) {
+          window.location.href = '/google-login/?code=' + code;
         }
       }
     </script>

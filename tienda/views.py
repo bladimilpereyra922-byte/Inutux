@@ -101,16 +101,9 @@ def chat_soporte(request):
 @login_required
 def pago(request):
     carrito, creado = Carrito.objects.get_or_create(usuario=request.user)
-    return render(request, 'tienda/pago.html', {'total': carrito.total()})
-def google_login(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        try:
-            decoded = firebase_auth.verify_id_token(data.get('token'))
-            email = decoded['email']
-            user, creado = User.objects.get_or_create(email=email, defaults={'username': email.split('@')[0]})
-            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            return JsonResponse({'success': True})
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
-    return JsonResponse({'success': False})
+    
+    # 👇 Reemplaza esta parte: Calculamos el total y lo formateamos estrictamente con punto decimal
+    total_calculado = carrito.total()
+    total_formateado = "{:.2f}".format(total_calculado) if total_calculado else "0.00"
+    
+    return render(request, 'tienda/pago.html', {'total': total_formateado})

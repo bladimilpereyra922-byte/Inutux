@@ -35,13 +35,17 @@
         </div>
         <a href="/carrito/" class="volver">← Volver al carrito</a>
     </div>
-    <script src="https://www.paypal.com/sdk/js?client-id=AXyBX3HTV0tDrpBfh3XC8-aJzZMCFbhz6_7X6QBV4WTA0H5FFMEdpoeDD12kt3_9qOz9IpPDi7HWK2Tm&currency=USD"></script>
+    
+    <script src="https://www.paypal.com/sdk/js?client-id=AV5-BiSZZnx9OxKMCXZD15qCN5E2QQnVirawrAlxu2GPYayjmNFPc44gBjZv9lie4FAa168ozn3AHlx3&currency=USD"></script>
     <script>
         paypal.Buttons({
             createOrder: function(data, actions) {
                 return actions.order.create({
                     purchase_units: [{
-                        amount: { value: '{{ total }}' }
+                        amount: { 
+                            // 👇 Aquí se quitó el filtro viejo para que use el número limpio que mandamos desde views.py
+                            value: '{{ total }}' 
+                        }
                     }]
                 });
             },
