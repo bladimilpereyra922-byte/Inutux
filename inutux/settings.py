@@ -93,7 +93,7 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
-# Permite que las cookies se envíen correctamente en respuestas de redirección externa (Google/Apple)
+# Permite que las cookies se envíen correctamente en respuestas de redirección externa
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SAMESITE = 'Lax'
@@ -106,7 +106,6 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:8000',
 ]
 
-# --- CONFIGURACIÓN DE CONFIANZA PARA CSRF (GOOGLE Y APPLE) ---
 CSRF_TRUSTED_ORIGINS = [
     'https://unitux.onrender.com',
     'https://inutux.onrender.com',
@@ -134,4 +133,8 @@ else:
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
 CACHE_MIDDLEWARE_SECONDS = 900
+
+# Redirecciones fijas de inicio de sesión
 LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'

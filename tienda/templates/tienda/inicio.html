@@ -44,7 +44,7 @@
             <a href="/proveedor/" style="color:#4fc3f7;margin-right:16px;text-decoration:none">Mi tienda</a>
             <a href="/logout/" style="background:#ff4444;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:700">Salir</a>
             {% else %}
-            <button onclick="loginGoogle()" class="btn-google">Entrar con Google</button>
+            <button onclick="window.loginGoogle()" class="btn-google">Entrar con Google</button>
             <a href="/login/" style="color:#4fc3f7;margin-right:16px;text-decoration:none">Iniciar sesion</a>
             <a href="/registro/" style="background:#1db954;color:#000;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:700">Registrarse</a>
             {% endif %}
@@ -71,6 +71,7 @@
         <h2>No hay productos disponibles aun</h2>
     </div>
     {% endif %}
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
@@ -89,30 +90,37 @@
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
 
-window.loginGoogle = function() {
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        return result.user.getIdToken();
-      })
-      .then((token) => {
-        return fetch('/google-login/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': document.cookie.match(/csrftoken=([^;]+)/)[1]
-          },
-          body: JSON.stringify({token: token})
+  window.loginGoogle = function() {
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          return result.user.getIdToken();
+        })
+        .then((token) => {
+          // Buscamos dinámicamente el token CSRF para evitar errores de seguridad
+          const csrfToken = document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+          
+          return fetch('/google-login/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({token: token})
+          });
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            // Redirección limpia al home relativo
+            window.location.replace('/');
+          } else {
+            alert('Error al iniciar sesion: ' + data.error);
+          }
+        })
+        .catch((error) => {
+          console.error('Error:', error);
         });
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          window.location.href = '/';
-        } else {
-          alert('Error al iniciar sesion: ' + data.error);
-        }
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
   }
+</script>
+</body>
+</html>
