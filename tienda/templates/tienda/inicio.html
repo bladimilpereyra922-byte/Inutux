@@ -73,9 +73,11 @@
     {% endif %}
 
 <script type="module">
+  // Paso 1: Traemos las herramientas necesarias desde Firebase
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+  import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
 
+  // Configuración de las credenciales de tu proyecto de Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyBRLwa4YsHq82L4tyKFPkQqUX__-as4BBo",
     authDomain: "unitux-c7b8b.firebaseapp.com",
@@ -90,37 +92,50 @@
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
 
+  // Paso 2: Esta función se activa cuando haces clic en el botón "Entrar con Google"
   window.loginGoogle = function() {
-      signInWithPopup(auth, provider)
-        .then((result) => {
-          return result.user.getIdToken();
-        })
-        .then((token) => {
-          // Buscamos dinámicamente el token CSRF para evitar errores de seguridad
-          const csrfToken = document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
-          
-          return fetch('/google-login/', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({token: token})
-          });
-        })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.success) {
-            // Redirección limpia al home relativo
-            window.location.replace('/');
-          } else {
-            alert('Error al iniciar sesion: ' + data.error);
-          }
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-        });
+      // Usamos redirección completa en lugar de Popup para saltar bloqueos del navegador
+      signInWithRedirect(auth, provider);
   }
+
+  // Paso 3: Este bloque se ejecuta AUTOMÁTICAMENTE cada vez que la página carga
+  // Revisa si venimos regresando de un inicio de sesión con Google exitoso
+  getRedirectResult(auth)
+    .then((result) => {
+      if (result) {
+        // Si hay un usuario válido, le pedimos su Token de identidad único
+        return result.user.getIdToken();
+      }
+    })
+    .then((token) => {
+      if (token) {
+        // Buscamos el código dinámico de seguridad de Django (CSRF Token) para que nos deje enviar datos
+        const csrfToken = document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+        
+        // Enviamos el Token de Google de forma segura a nuestro backend de Django
+        return fetch('/google-login/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+          },
+          body: JSON.stringify({token: token})
+        });
+      }
+    })
+    .then((response) => response ? response.json() : null)
+    .then((data) => {
+      if (data && data.success) {
+        // Si Django creó la sesión correctamente, refrescamos la página principal
+        window.location.replace('/');
+      } else if (data && data.error) {
+        alert('Error al iniciar sesion: ' + data.error);
+      }
+    })
+    .catch((error) => {
+      // Si algo sale mal en el camino, lo escribe detalladamente aquí
+      console.error('Error al regresar de Google:', error);
+    });
 </script>
 </body>
 </html>

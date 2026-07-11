@@ -67,19 +67,26 @@
     <script>
       function oauthSignIn() {
         var oauth2Endpoint = 'https://accounts.google.com/o/oauth2/v2/auth';
+        
+        // Creamos un formulario invisible usando JavaScript para enviar los datos a Google
         var form = document.createElement('form');
         form.setAttribute('method', 'GET'); 
         form.setAttribute('action', oauth2Endpoint);
+        
+        // Detectamos automáticamente el dominio actual (local o producción)
+        var dominioActual = window.location.origin;
       
         var params = {
           'client_id': '1001380630801-h5nsvp8tm1b9dgv05cd49d0gq96u0kkf.apps.googleusercontent.com',
-          'redirect_uri': 'http://127.0.0.1:8000/google-login/', 
+          // Combinamos el dominio detectado con la ruta interna para que sea dinámico
+          'redirect_uri': dominioActual + '/google-login/', 
           'response_type': 'code',
           'scope': 'openid email profile',
           'include_granted_scopes': 'true',
           'state': 'pass-through-value'
         };
       
+        // Este bucle toma los parámetros de arriba y los mete como campos ocultos en el formulario
         for (var p in params) {
           var input = document.createElement('input');
           input.setAttribute('type', 'hidden');
@@ -89,13 +96,14 @@
         }
       
         document.body.appendChild(form);
-        form.submit();
+        form.submit(); // Envía los datos y redirige al usuario hacia Google
       }
 
       window.onload = function() {
         var urlParams = new URLSearchParams(window.location.search);
         var code = urlParams.get('code');
         
+        // Si Google nos devuelve un código válido, mandamos al usuario a completar el login en Django
         if (code) {
           window.location.href = '/google-login/?code=' + code;
         }
