@@ -38,7 +38,7 @@ def google_login(request):
         return JsonResponse({'success': False, 'error': 'No se recibio el codigo de Google'}, status=400)
 
     # 👇 Tu ID de Google que ya funciona nítido
-    client_id = '1001380630801-h5nsvp8tm1b9dgv05cd49d0gq96u0kkf.apps.googleusercontent.com'
+    client_id = os.environ.get('GOOGLE_CLIENT_ID')
     
     client_secret = os.environ.get('GOOGLE_CLIENT_SECRET')
     redirect_uri = request.build_absolute_uri('/google-login/')
