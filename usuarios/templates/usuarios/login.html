@@ -75,7 +75,6 @@
         var dominioActual = window.location.origin;
       
         var params = {
-          // Ahora usa la etiqueta dinámica para jalar la variable GOOGLE_CLIENT_ID desde el backend
           'client_id': '551444650101-8pjtico4t1ndd15jlqngqunhbnsqu6bg.apps.googleusercontent.com', 
           'redirect_uri': dominioActual + '/google-login/', 
           'response_type': 'code',
@@ -94,15 +93,6 @@
       
         document.body.appendChild(form);
         form.submit(); 
-      }
-
-      window.onload = function() {
-        var urlParams = new URLSearchParams(window.location.search);
-        var code = urlParams.get('code');
-        
-        if (code) {
-          window.location.href = '/google-login/?code=' + code;
-        }
       }
     </script>
 </body>
