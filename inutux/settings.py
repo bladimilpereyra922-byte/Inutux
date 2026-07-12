@@ -23,8 +23,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    # Se comentaron las líneas de caché para evitar que se queden guardados IDs viejos
-    # 'django.middleware.cache.UpdateCacheMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -34,7 +32,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'inutux.urls'
@@ -94,9 +91,13 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
-# Permite que las cookies se envíen correctamente en respuestas de redirección externa
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+# --- CONFIGURACIÓN DE SEGURIDAD PARA RENDER (SÚPER IMPORTANTE) ---
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = False  # Evita bucles infinitos de redirección http/https en Render
+
+# Ajuste de Cookies para permitir que se compartan bien con el login de Google
+SESSION_COOKIE_SECURE = True if not DEBUG else False
+CSRF_COOKIE_SECURE = True if not DEBUG else False
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SAMESITE = 'Lax'
 

@@ -3,8 +3,9 @@ import requests
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.models import User
+from django.contrib.models import User
 from django.http import HttpResponse, JsonResponse
+from django.contrib.auth.models import User
 
 def registro(request):
     if request.method == 'POST':
@@ -37,11 +38,14 @@ def google_login(request):
     if not codigo_google:
         return JsonResponse({'success': False, 'error': 'No se recibio el codigo de Google'}, status=400)
 
-    # 👇 Tu ID de Google que ya funciona nítido
     client_id = os.environ.get('GOOGLE_CLIENT_ID')
-    
     client_secret = os.environ.get('GOOGLE_CLIENT_SECRET')
-    redirect_uri = request.build_absolute_uri('/google-login/')
+    
+    # 🛠️ DETECCIÓN DINÁMICA DE HTTPS PARA RENDER:
+    if os.environ.get('DATABASE_URL'):  # Si esta variable existe, estamos en Render
+        redirect_uri = 'https://inutux.onrender.com/google-login/'
+    else:
+        redirect_uri = request.build_absolute_uri('/google-login/')
 
     try:
         token_response = requests.post('https://oauth2.googleapis.com/token', data={
