@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+< lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Iniciar sesion - Unitux</title>
@@ -40,7 +40,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
 </head>
-<body>
+<>
     <div class="tarjeta">
         <div class="logo">UNITUX</div>
         <div class="slogan">Compras seguras y confiables</div>
@@ -70,7 +70,7 @@
         <a href="/registro/">No tienes cuenta? Registrate</a>
     </div>
 
-    <script>
+    <>
       // Configuración de tu App de Firebase
       const firebaseConfig = {
         apiKey: "AIzaSyBRLwa4YsHq82L4tyKFPkQqUX__-as4BBo",
@@ -99,6 +99,36 @@
       }).catch((error) => {
         console.error("Error en Firebase Auth:", error);
       });
+    <script>
+      // Configuración de tu App de Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyBRLwa4YsHq82L4tyKFPkQqUX__-as4BBo",
+        authDomain: "unitux-c7b8b.firebaseapp.com",
+        projectId: "unitux-c7b8b",
+        storageBucket: "unitux-c7b8b.appspot.com",
+        messagingSenderId: "551444650101",
+        appId: "1:551444650101:web:ddf8ba43b5df5104de3d95"
+      };
+
+      // Inicialización
+      firebase.initializeApp(firebaseConfig);
+      
+      function ejecutarLoginGoogle() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        
+        // Usamos Popup para evitar los choques de redirección del handler de Firebase
+        firebase.auth().signInWithPopup(provider)
+          .then((result) => {
+            if (result.user) {
+              result.user.getIdToken().then((idToken) => {
+                // Enviamos el token directamente a la ruta exacta que Django espera
+                window.location.href = "/google-login/?token=" + idToken;
+              });
+            }
+          })
+          .catch((error) => {
+            console.error("Error en Firebase Auth:", error);
+            alert("Hubo un problema al conectar con Google. Por favor, intenta de nuevo.");
+          });
+      }
     </script>
-</body>
-</html>
