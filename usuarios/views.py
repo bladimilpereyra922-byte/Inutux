@@ -33,44 +33,36 @@ def logout_view(request):
     return redirect('inicio')
 
 def google_login(request):
-    codigo_google = request.GET.get('code')
-    if not codigo_google:
-        return JsonResponse({'success': False, 'error': 'No se recibio el codigo de Google'}, status=400)
+    # Ahora Django recibe el token de autenticación que genera Firebase en el navegador
+    id_token = request.GET.get('token')
+    if not id_token:
+        return JsonResponse({'success': False, 'error': 'No se recibió el token de Firebase'}, status=400)
 
-    # Variables de entorno alineadas perfectamente
-    client_id = os.environ.get('GOOGLE_CLIENT_ID')
-    client_secret = os.environ.get('GOOGLE_CLIENT_SECRET')
+    # El ID de tu proyecto Firebase
+    firebase_project_id = "unitux-c7b8b"
     
-    # Detección dinámica limpia para Render o Entorno Local
-    if os.environ.get('DATABASE_URL'):
-        redirect_uri = 'https://inutux.onrender.com/google-login/'
-    else:
-        redirect_uri = request.build_absolute_uri('/google-login/')
-
     try:
-        token_response = requests.post('https://oauth2.googleapis.com/token', data={
-            'code': codigo_google,
-            'client_id': client_id,
-            'client_secret': client_secret,
-            'redirect_uri': redirect_uri,
-            'grant_type': 'authorization_code'
-        })
+        # Validamos el token directamente con la API oficial de Firebase para total seguridad
+        url_verificar = f"https://identitytoolkit.googleapis.com/v1/accounts:lookup?key={os.environ.get('GOOGLE_CLIENT_SECRET')}"
+        response = requests.post(url_verificar, json={"idToken": id_token})
+        datos_usuario = response.json()
         
-        datos_token = token_response.json()
-        access_token = datos_token.get('access_token')
+        if 'users' not in datos_usuario:
+            return JsonResponse({'success': False, 'error': 'Token de Firebase inválido', 'detalle': datos_usuario}, status=400)
         
-        if not access_token:
-            return JsonResponse({'success': False, 'error': 'No se pudo obtener el access token', 'detalle': datos_token}, status=400)
-
-        user_data = requests.get('https://www.googleapis.com/oauth2/v2/userinfo',
-            headers={'Authorization': f'Bearer {access_token}'}).json()
-
-        correo = user_data.get('email')
+        info_perfil = datos_usuario['users'][0]
+        correo = info_perfil.get('email')
+        
         if correo:
+            # Buscamos el usuario en tu base de datos o lo creamos si es nuevo
             user, created = User.objects.get_or_create(
                 email=correo,
-                defaults={'username': correo.split('@')[0], 'first_name': user_data.get('given_name', '')}
+                defaults={
+                    'username': correo.split('@')[0], 
+                    'first_name': info_perfil.get('displayName', '').split(' ')[0]
+                }
             )
+            # Iniciamos sesión en Django de forma segura
             login(request, user)
             return redirect('inicio')
             

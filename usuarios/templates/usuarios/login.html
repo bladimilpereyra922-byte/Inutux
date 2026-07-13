@@ -71,7 +71,7 @@
     </div>
 
     <script>
-      // Configuración extraída directamente de tu init.json de Firebase
+      // Configuración de tu App de Firebase
       const firebaseConfig = {
         apiKey: "AIzaSyBRLwa4YsHq82L4tyKFPkQqUX__-as4BBo",
         authDomain: "unitux-c7b8b.firebaseapp.com",
@@ -81,7 +81,7 @@
         appId: "1:551444650101:web:ddf8ba43b5df5104de3d95"
       };
 
-      // Inicializar Firebase de forma segura
+      // Inicialización
       firebase.initializeApp(firebaseConfig);
       
       function ejecutarLoginGoogle() {
@@ -89,11 +89,10 @@
         firebase.auth().signInWithRedirect(provider);
       }
 
-      // Al regresar de Google, extrae el token y redirige a Django con el código/token correspondiente
+      // Al retornar de Google, procesa el token y se lo envía limpio a Django
       firebase.auth().getRedirectResult().then((result) => {
-        if (result.user) {
+        if (result && result.user) {
           result.user.getIdToken().then((idToken) => {
-            // Se envía directamente a tu vista encargada de recibirlo en Django
             window.location.href = "/google-login/?token=" + idToken;
           });
         }
