@@ -21,16 +21,18 @@ if not firebase_admin._apps:
         except Exception as e:
             raise ValueError(f"Error al procesar la variable FIREBASE_KEY: {e}")
     else:
-        # Local: Si no existe la variable, busca el archivo físico
-        ruta_local = 'unitux-c7b8b-firebase-adminsdk-fbsvc-21553d0c90.json'
-        if os.path.exists(ruta_local):
-            cred = credentials.Certificate(ruta_local)
-        elif os.path.exists('firebase-key.json'):
-            cred = credentials.Certificate('firebase-key.json')
-        else:
-            raise FileNotFoundError("No se encontró la variable FIREBASE_KEY ni el archivo JSON local de Firebase.")
+     ruta_local = "unitux-c7b8b-firebase-adminsdk-fbsvc-21553d0c90.json"
 
-    firebase_admin.initialize_app(cred)
+    if os.path.exists(ruta_local):
+        cred = credentials.Certificate(ruta_local)
+        firebase_admin.initialize_app(cred)
+
+    elif os.path.exists("firebase-key.json"):
+        cred = credentials.Certificate("firebase-key.json")
+        firebase_admin.initialize_app(cred)
+
+    else:
+        print("⚠ Firebase no configurado. El proyecto iniciará sin Firebase.")
 
 def inicio(request):
     busqueda = request.GET.get('q', '')

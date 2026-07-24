@@ -18,8 +18,23 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'tienda',
-    'usuarios',
+    # Aplicaciones de dominio de Unitux. Se registran mediante sus AppConfig
+    # para mantener una base modular preparada para futuras migraciones.
+    'core.apps.CoreConfig',
+    'usuarios.apps.UsuariosConfig',
+    'proveedores.apps.ProveedoresConfig',
+    'catalogo.apps.CatalogoConfig',
+    'carrito.apps.CarritoConfig',
+    'pedidos.apps.PedidosConfig',
+    'pagos.apps.PagosConfig',
+    'envios.apps.EnviosConfig',
+    'soporte.apps.SoporteConfig',
+    'ia.apps.IaConfig',
+    'notificaciones.apps.NotificacionesConfig',
+    'analytics.apps.AnalyticsConfig',
+    'api.apps.ApiConfig',
+    # Módulo histórico: sus modelos permanecen aquí hasta una migración segura.
+    'tienda.apps.TiendaConfig',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,41 @@
+language = "es"
+
+default_agent = "project_manager"
+
+default_workflow = "default"
+
+default_context = "default"
+
+reasoning_effort = "high"
+
+approval_policy = "on-request"
+
+sandbox_mode = "workspace-write"
+
+[project]
+
+documentation_language = "es"
+
+analysis_language = "es"
+
+comments_language = "es"
+
+commit_language = "es"
+
+report_language = "es"
+
+[behavior]
+
+always_analyze_first = true
+
+always_use_workflow = true
+
+always_document_changes = true
+
+always_answer_in_spanish = true
+
+never_skip_architecture_review = true
+
+never_skip_security_review = true
+
+never_assume_without_evidence = true

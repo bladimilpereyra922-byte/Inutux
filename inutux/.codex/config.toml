@@ -1,0 +1,18 @@
+version = 1
+
+language = "es"
+
+default_model = "gpt-5.6"
+
+reasoning = "high"
+
+sandbox = "workspace-write"
+
+[workflow]
+analyze_first = true
+architecture_review = true
+dependency_check = true
+testing = true
+documentation = true
+security_review = true
+performance_review = true
