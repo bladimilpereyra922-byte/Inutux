@@ -4,11 +4,16 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-nrp@c6mg#4dj92nf7_h)+lvhby96w960+x%k09k_a&vhun46nc'
+SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['unitux.onrender.com', 'inutux.onrender.com', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = [
+    'unitux.onrender.com',
+    'inutux.onrender.com',
+    '127.0.0.1',
+    'localhost'
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -17,9 +22,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'corsheaders',
-    # Aplicaciones de dominio de Unitux. Se registran mediante sus AppConfig
-    # para mantener una base modular preparada para futuras migraciones.
+
     'core.apps.CoreConfig',
     'usuarios.apps.UsuariosConfig',
     'proveedores.apps.ProveedoresConfig',
@@ -33,8 +38,6 @@ INSTALLED_APPS = [
     'notificaciones.apps.NotificacionesConfig',
     'analytics.apps.AnalyticsConfig',
     'api.apps.ApiConfig',
-    # Módulo histórico: sus modelos permanecen aquí hasta una migración segura.
-    'tienda.apps.TiendaConfig',
 ]
 
 MIDDLEWARE = [
@@ -84,10 +87,18 @@ else:
     }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
 
 LANGUAGE_CODE = 'es'
@@ -96,9 +107,11 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 SECURE_BROWSER_XSS_FILTER = True
@@ -106,14 +119,16 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
-# --- CONFIGURACIÓN DE SEGURIDAD PARA RENDER (SÚPER IMPORTANTE) ---
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = False  # Evita bucles infinitos de redirección http/https en Render
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SECURE_SSL_REDIRECT = False
 
-# Ajuste de Cookies para permitir que se compartan bien con el login de Google
-SESSION_COOKIE_SECURE = True if not DEBUG else False
-CSRF_COOKIE_SECURE = True if not DEBUG else False
-SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 CSRF_COOKIE_SAMESITE = 'Lax'
 
 CORS_ALLOWED_ORIGINS = [
@@ -137,7 +152,7 @@ if os.environ.get('REDIS_URL'):
             'LOCATION': os.environ.get('REDIS_URL'),
             'OPTIONS': {
                 'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            }
+            },
         }
     }
 else:
@@ -151,7 +166,8 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
 CACHE_MIDDLEWARE_SECONDS = 900
 
-# Redirecciones fijas de inicio de sesión
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
