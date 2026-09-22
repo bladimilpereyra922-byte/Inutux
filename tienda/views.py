@@ -1,111 +1,85 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from django.contrib.auth import login
-from django.http import JsonResponse
-from .models import Producto, Categoria, Carrito, ItemCarrito, Proveedor, Reporte
-import firebase_admin
-from firebase_admin import credentials, auth as firebase_auth
-import os
 import json
+import os
 
-# Inicialización segura de Firebase Admin SDK para Render y Local
+import firebase_admin
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, render
+from firebase_admin import credentials
+
+from .models import Carrito, Producto, Proveedor
+
+# ---------------------------------------------------------------------------
+# Inicialización segura de Firebase Admin SDK (Render + Local)
+# ---------------------------------------------------------------------------
 if not firebase_admin._apps:
-    firebase_key = os.environ.get('FIREBASE_KEY')
-    
+    firebase_key = os.environ.get("FIREBASE_KEY")
+
     if firebase_key:
         try:
-            # Render: Cargamos el JSON desde la variable de entorno
             cred_dict = json.loads(firebase_key)
             cred = credentials.Certificate(cred_dict)
-        except Exception as e:
-            raise ValueError(f"Error al procesar la variable FIREBASE_KEY: {e}")
+            firebase_admin.initialize_app(cred)
+        except (json.JSONDecodeError, ValueError) as e:
+            print(f"⚠️ Error procesando FIREBASE_KEY: {e}")
     else:
-     ruta_local = "unitux-c7b8b-firebase-adminsdk-fbsvc-21553d0c90.json"
+        ruta_local = "unitux-c7b8b-firebase-adminsdk-fbsvc-21553d0c90.json"
+        if os.path.exists(ruta_local):
+            cred = credentials.Certificate(ruta_local)
+            firebase_admin.initialize_app(cred)
+        elif os.path.exists("firebase-key.json"):
+            cred = credentials.Certificate("firebase-key.json")
+            firebase_admin.initialize_app(cred)
+        else:
+            print("⚠️ Firebase no configurado. El proyecto iniciará sin Firebase.")
 
-    if os.path.exists(ruta_local):
-        cred = credentials.Certificate(ruta_local)
-        firebase_admin.initialize_app(cred)
 
-    elif os.path.exists("firebase-key.json"):
-        cred = credentials.Certificate("firebase-key.json")
-        firebase_admin.initialize_app(cred)
-
-    else:
-        print("⚠ Firebase no configurado. El proyecto iniciará sin Firebase.")
-
+# ---------------------------------------------------------------------------
+# Vistas Principales
+# ---------------------------------------------------------------------------
 def inicio(request):
-    busqueda = request.GET.get('q', '')
+    """Pantalla principal Cyber-Luxe conectada a catalogo.Producto."""
+    busqueda = request.GET.get("q", "")
+
     productos = Producto.objects.filter(activo=True)
     if busqueda:
         productos = productos.filter(nombre__icontains=busqueda)
-    categorias = Categoria.objects.all()
-    return render(request, 'tienda/inicio.html', {'productos': productos, 'categorias': categorias, 'busqueda': busqueda})
 
-def detalle_producto(request, pk):
-    producto = get_object_or_404(Producto, pk=pk, activo=True)
-    return render(request, 'tienda/detalle.html', {'producto': producto})
+    productos_destacados = productos.order_by("-creado_en")[:8]
 
-@login_required
-def agregar_carrito(request, pk):
-    producto = get_object_or_404(Producto, pk=pk)
-    carrito, creado = Carrito.objects.get_or_create(usuario=request.user)
-    item, creado = ItemCarrito.objects.get_or_create(carrito=carrito, producto=producto)
-    if not creado:
-        item.cantidad += 1
-        item.save()
-    return redirect('carrito')
+    return render(
+        request,
+        "tienda/home.html",
+        {
+            "productos_destacados": productos_destacados,
+            "busqueda": busqueda,
+        },
+    )
+
 
 @login_required
 def ver_carrito(request):
-    carrito, creado = Carrito.objects.get_or_create(usuario=request.user)
-    return render(request, 'tienda/carrito.html', {'carrito': carrito})
+    carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
+    return render(request, "tienda/carrito.html", {"carrito": carrito})
 
-@login_required
-def eliminar_carrito(request, pk):
-    item = get_object_or_404(ItemCarrito, pk=pk, carrito__usuario=request.user)
-    item.delete()
-    return redirect('carrito')
 
 @login_required
 def panel_proveedor(request):
     try:
-        proveedor = request.user.proveedor
-        if proveedor.estado != 'aprobado':
-            return render(request, 'tienda/pendiente.html')
+        proveedor = Proveedor.objects.get(usuario=request.user)
         productos = Producto.objects.filter(proveedor=proveedor)
-        return render(request, 'tienda/panel_proveedor.html', {'proveedor': proveedor, 'productos': productos})
-    except:
-        return redirect('registro_proveedor')
-
-@login_required
-def registro_proveedor(request):
-    if request.method == 'POST':
-        Proveedor.objects.create(
-            usuario=request.user,
-            nombre_tienda=request.POST.get('nombre_tienda'),
-            descripcion=request.POST.get('descripcion'),
-            telefono=request.POST.get('telefono')
+        return render(
+            request,
+            "tienda/panel_proveedor.html",
+            {"proveedor": proveedor, "productos": productos},
         )
-        return redirect('panel_proveedor')
-    return render(request, 'tienda/registro_proveedor.html')
+    except Proveedor.DoesNotExist:
+        return redirect("registro_proveedor")
 
-@login_required
-def chat_soporte(request):
-    respuesta = None
-    if request.method == 'POST':
-        proveedor = get_object_or_404(Proveedor, pk=request.POST.get('proveedor_id'))
-        Reporte.objects.create(cliente=request.user, proveedor=proveedor, mensaje=request.POST.get('mensaje'))
-        respuesta = 'Gracias por tu reporte. Hemos recibido tu queja sobre ' + proveedor.nombre_tienda + ' y el equipo de Unitux la revisara pronto.'
-    proveedores = Proveedor.objects.filter(estado='aprobado')
-    return render(request, 'tienda/chat_soporte.html', {'proveedores': proveedores, 'respuesta': respuesta})
 
 @login_required
 def pago(request):
-    carrito, creado = Carrito.objects.get_or_create(usuario=request.user)
-    
-    # 👇 Reemplaza esta parte: Calculamos el total y lo formateamos estrictamente con punto decimal
+    carrito, _ = Carrito.objects.get_or_create(usuario=request.user)
     total_calculado = carrito.total()
-    total_formateado = "{:.2f}".format(total_calculado) if total_calculado else "0.00"
-    
-    return render(request, 'tienda/pago.html', {'total': total_formateado})
+    total_formateado = f"{total_calculado:.2f}" if total_calculado else "0.00"
+
+    return render(request, "tienda/pago.html", {"total": total_formateado})

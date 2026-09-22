@@ -1,0 +1,68 @@
+[
+    {
+        "function": "eval(",
+        "severity": "CRITICAL",
+        "risk": "Code Execution",
+        "recommendation": "Nunca ejecutar código dinámico con eval()."
+    },
+    {
+        "function": "exec(",
+        "severity": "CRITICAL",
+        "risk": "Remote Code Execution",
+        "recommendation": "Eliminar exec() y usar lógica segura."
+    },
+    {
+        "function": "os.system(",
+        "severity": "HIGH",
+        "risk": "Command Injection",
+        "recommendation": "Usar subprocess.run() con listas y validar entradas."
+    },
+    {
+        "function": "subprocess.Popen(",
+        "severity": "HIGH",
+        "risk": "Command Injection",
+        "recommendation": "No usar shell=True y validar todos los parámetros."
+    },
+    {
+        "function": "pickle.loads(",
+        "severity": "CRITICAL",
+        "risk": "Arbitrary Code Execution",
+        "recommendation": "No deserializar datos de usuarios."
+    },
+    {
+        "function": "yaml.load(",
+        "severity": "HIGH",
+        "risk": "Unsafe Deserialization",
+        "recommendation": "Usar yaml.safe_load()."
+    },
+    {
+        "function": "input(",
+        "severity": "LOW",
+        "risk": "Untrusted Input",
+        "recommendation": "Validar siempre la entrada del usuario."
+    },
+    {
+        "function": "open(",
+        "severity": "LOW",
+        "risk": "File Access",
+        "recommendation": "Validar rutas y permisos."
+    },
+    {
+        "function": "random.random(",
+        "severity": "MEDIUM",
+        "risk": "Weak Randomness",
+        "recommendation": "Usar secrets o secrets.token_hex() para datos sensibles."
+    },
+    {
+        "function": "md5(",
+        "severity": "HIGH",
+        "risk": "Weak Cryptography",
+        "recommendation": "Usar SHA-256, SHA-512 o Argon2/Bcrypt para contraseñas."
+    },
+    {
+        "function": "sha1(",
+        "severity": "HIGH",
+        "risk": "Weak Cryptography",
+        "recommendation": "Usar SHA-256 o superior."
+    }
+]

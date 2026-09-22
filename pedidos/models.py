@@ -116,7 +116,7 @@ class PedidoProveedor(models.Model):
         related_name='pedidos_proveedor',
     )
     proveedor = models.ForeignKey(
-        'tienda.Proveedor',
+        'proveedores.Proveedor',
         on_delete=models.PROTECT,
         related_name='pedidos_proveedor',
     )
@@ -199,7 +199,7 @@ class ItemPedido(models.Model):
         related_name='items',
     )
     producto = models.ForeignKey(
-        'tienda.Producto',
+        'catalogo.Producto',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

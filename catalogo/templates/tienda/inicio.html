@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unitux - Compras seguras y confiables</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #08090f; color: #fff; font-family: Arial, sans-serif; }
+        header { background: #0d1117; padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1db954; gap: 20px; }
+        .header-brand { display: flex; flex-direction: column; }
+        .logo { font-size: 28px; font-weight: 900; color: #00f5ff; text-decoration: none; }
+        .slogan { color: #1db954; font-size: 12px; letter-spacing: 2px; }
+        .search-form { display: flex; flex-grow: 1; max-width: 500px; gap: 8px; margin: 0 20px; }
+        .search-input { padding: 8px 16px; background: #1a1a2e; border: 1px solid #1db954; border-radius: 8px; color: #fff; width: 100%; outline: none; }
+        .search-button { background: #1db954; color: #000; padding: 8px 16px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .nav-links { display: flex; align-items: center; }
+        .productos { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; padding: 40px; }
+        .card { background: #0d1117; border: 1px solid #1a1a2e; border-radius: 12px; padding: 16px; transition: border-color 0.3s; }
+        .card:hover { border-color: #1db954; }
+        .card img { width: 100%; height: 160px; object-fit: cover; border-radius: 8px; }
+        .card h3 { margin-top: 12px; font-size: 16px; color: #fff; }
+        .card .precio { color: #1db954; font-size: 20px; font-weight: 700; margin-top: 8px; }
+        .card .proveedor { color: #4fc3f7; font-size: 12px; margin-top: 4px; }
+        .card a { display: block; margin-top: 12px; background: #1db954; color: #000; text-align: center; padding: 8px; border-radius: 8px; text-decoration: none; font-weight: 700; }
+        .sin-productos { text-align: center; padding: 80px; color: #4fc3f7; }
+        .btn-google { background:#fff;color:#000;padding:8px 16px;border:none;border-radius:8px;font-weight:700;cursor:pointer;margin-right:8px }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-brand">
+            <a href="/" class="logo">UNITUX</a>
+            <div class="slogan">Compras seguras y confiables</div>
+        </div>
+        <form method="get" action="/" class="search-form">
+            <input type="text" name="q" value="{{ busqueda }}" placeholder="Buscar productos..." class="search-input">
+            <button type="submit" class="search-button">Buscar</button>
+        </form>
+        <div class="nav-links">
+            {% if user.is_authenticated %}
+            <span style="color:#4fc3f7;margin-right:16px">Hola, {{ user.username }}</span>
+            <a href="{% url 'chat_soporte' %}" style="color:#1db954;margin-right:16px;text-decoration:none;font-weight:700">Soporte</a>
+            <a href="/proveedor/" style="color:#4fc3f7;margin-right:16px;text-decoration:none">Mi tienda</a>
+            <a href="/logout/" style="background:#ff4444;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:700">Salir</a>
+            {% else %}
+            <button onclick="window.loginGoogle()" class="btn-google">Entrar con Google</button>
+            <a href="/login/" style="color:#4fc3f7;margin-right:16px;text-decoration:none">Iniciar sesion</a>
+            <a href="/registro/" style="background:#1db954;color:#000;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:700">Registrarse</a>
+            {% endif %}
+        </div>
+    </header>
+    {% if productos %}
+    <div class="productos">
+        {% for producto in productos %}
+        <div class="card">
+            {% if producto.imagen %}
+            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+            {% else %}
+            <div style="width:100%;height:160px;background:#1a1a2e;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#4fc3f7;">Sin imagen</div>
+            {% endif %}
+            <h3>{{ producto.nombre }}</h3>
+            <div class="precio">${{ producto.precio }}</div>
+            <div class="proveedor">Vendido por: {{ producto.proveedor.nombre_tienda }}</div>
+            <a href="/producto/{{ producto.pk }}/">Ver producto</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="sin-productos">
+        <h2>No hay productos disponibles aun</h2>
+    </div>
+    {% endif %}
+
+<script type="module">
+  // Paso 1: Traemos las herramientas necesarias desde Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+
+  // Configuración de las credenciales de tu proyecto de Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyBRLwa4YsHq82L4tyKFPkQqUX__-as4BBo",
+    authDomain: "unitux-c7b8b.firebaseapp.com",
+    projectId: "unitux-c7b8b",
+    storageBucket: "unitux-c7b8b.firebasestorage.app",
+    messagingSenderId: "551444650101",
+    appId: "1:551444650101:web:c06c9f383c36ac2886c03c",
+    measurementId: "G-S7LD3HMF39"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  // Paso 2: Esta función se activa cuando haces clic en el botón "Entrar con Google"
+  window.loginGoogle = function() {
+      // Usamos redirección completa en lugar de Popup para saltar bloqueos del navegador
+      signInWithRedirect(auth, provider);
+  }
+
+  // Paso 3: Este bloque se ejecuta AUTOMÁTICAMENTE cada vez que la página carga
+  // Revisa si venimos regresando de un inicio de sesión con Google exitoso
+  getRedirectResult(auth)
+    .then((result) => {
+      if (result) {
+        // Si hay un usuario válido, le pedimos su Token de identidad único
+        return result.user.getIdToken();
+      }
+    })
+    .then((token) => {
+      if (token) {
+        // Buscamos el código dinámico de seguridad de Django (CSRF Token) para que nos deje enviar datos
+        const csrfToken = document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+        
+        // Enviamos el Token de Google de forma segura a nuestro backend de Django
+        return fetch('/google-login/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+          },
+          body: JSON.stringify({token: token})
+        });
+      }
+    })
+    .then((response) => response ? response.json() : null)
+    .then((data) => {
+      if (data && data.success) {
+        // Si Django creó la sesión correctamente, refrescamos la página principal
+        window.location.replace('/');
+      } else if (data && data.error) {
+        alert('Error al iniciar sesion: ' + data.error);
+      }
+    })
+    .catch((error) => {
+      // Si algo sale mal en el camino, lo escribe detalladamente aquí
+      console.error('Error al regresar de Google:', error);
+    });
+</script>
+</body>
+</html>

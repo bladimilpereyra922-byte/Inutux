@@ -6,9 +6,8 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pedidos', '0001_initial'),
-        ('tienda', '0003_reporte'),
-    ]
+    ('pedidos', '0001_initial'),
+]
 
     operations = [
         migrations.RemoveConstraint(

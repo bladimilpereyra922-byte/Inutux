@@ -1,0 +1,79 @@
+[
+    {
+        "name": "OpenAI API Key",
+        "pattern": "sk-[A-Za-z0-9_-]{20,}",
+        "severity": "CRITICAL",
+        "message": "API Key de OpenAI expuesta.",
+        "recommendation": "Mover la clave a variables de entorno (.env)."
+    },
+    {
+        "name": "GitHub Personal Access Token",
+        "pattern": "ghp_[A-Za-z0-9]{36}",
+        "severity": "CRITICAL",
+        "message": "Token de GitHub expuesto.",
+        "recommendation": "Revocar inmediatamente el token y generar uno nuevo."
+    },
+    {
+        "name": "GitHub Fine Grained Token",
+        "pattern": "github_pat_[A-Za-z0-9_]{20,}",
+        "severity": "CRITICAL",
+        "message": "Token Fine-Grained de GitHub expuesto.",
+        "recommendation": "Eliminar el token del código y regenerarlo."
+    },
+    {
+        "name": "AWS Access Key",
+        "pattern": "AKIA[0-9A-Z]{16}",
+        "severity": "CRITICAL",
+        "message": "AWS Access Key encontrada.",
+        "recommendation": "Rotar inmediatamente las credenciales."
+    },
+    {
+        "name": "Stripe Secret Key",
+        "pattern": "sk_live_[A-Za-z0-9]{24,}",
+        "severity": "CRITICAL",
+        "message": "Stripe Secret Key encontrada.",
+        "recommendation": "Mover la clave a un gestor seguro de secretos."
+    },
+    {
+        "name": "Google API Key",
+        "pattern": "AIza[0-9A-Za-z\\-_]{35}",
+        "severity": "HIGH",
+        "message": "Google API Key encontrada.",
+        "recommendation": "Restringir el uso y almacenarla fuera del código."
+    },
+    {
+        "name": "Slack Token",
+        "pattern": "xox[baprs]-[A-Za-z0-9-]{10,}",
+        "severity": "HIGH",
+        "message": "Token de Slack encontrado.",
+        "recommendation": "Revocar el token y crear uno nuevo."
+    },
+    {
+        "name": "Discord Token",
+        "pattern": "[MN][A-Za-z\\d]{23}\\.[\\w-]{6}\\.[\\w-]{27}",
+        "severity": "HIGH",
+        "message": "Token de Discord encontrado.",
+        "recommendation": "Revocar inmediatamente el token."
+    },
+    {
+        "name": "JWT Hardcoded",
+        "pattern": "eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+",
+        "severity": "MEDIUM",
+        "message": "JWT encontrado en el código.",
+        "recommendation": "No almacenar JWT directamente en archivos fuente."
+    },
+    {
+        "name": "Password Hardcoded",
+        "pattern": "(?i)(password|passwd|pwd)\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+        "severity": "CRITICAL",
+        "message": "Contraseña escrita directamente en el código.",
+        "recommendation": "Mover la contraseña a variables de entorno."
+    },
+    {
+        "name": "SECRET_KEY Hardcoded",
+        "pattern": "(?i)SECRET_KEY\\s*=\\s*['\\\"][^'\\\"]+['\\\"]",
+        "severity": "CRITICAL",
+        "message": "SECRET_KEY encontrada en el código.",
+        "recommendation": "Usar os.getenv('SECRET_KEY')."
+    }
+]

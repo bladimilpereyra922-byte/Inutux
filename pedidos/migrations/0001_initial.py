@@ -10,9 +10,8 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('tienda', '0003_reporte'),
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-    ]
+    migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+]
 
     operations = [
         migrations.CreateModel(
@@ -102,7 +101,7 @@ class Migration(migrations.Migration):
                 ('cancelado_en', models.DateTimeField(blank=True, null=True)),
                 ('motivo_cancelacion', models.TextField(blank=True)),
                 ('pedido', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='pedidos_proveedor', to='pedidos.pedido')),
-                ('proveedor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='pedidos_proveedor', to='tienda.proveedor')),
+                ('proveedor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='pedidos_proveedor', to='proveedores.proveedor')),
             ],
             options={
                 'verbose_name': 'pedido de proveedor',
@@ -121,7 +120,7 @@ class Migration(migrations.Migration):
                 ('cantidad', models.PositiveIntegerField()),
                 ('subtotal', models.DecimalField(decimal_places=2, max_digits=12)),
                 ('creado_en', models.DateTimeField(auto_now_add=True)),
-                ('producto', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='items_pedido', to='tienda.producto')),
+                ('producto', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='items_pedido', to='catalogo.producto')),
                 ('pedido_proveedor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='items', to='pedidos.pedidoproveedor')),
             ],
             options={

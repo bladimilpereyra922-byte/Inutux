@@ -1,0 +1,72 @@
+[
+    {
+        "id": "A01",
+        "name": "Broken Access Control",
+        "severity": "CRITICAL",
+        "description": "Fallas en el control de acceso.",
+        "recommendation": "Validar permisos en todas las vistas y APIs."
+    },
+    {
+        "id": "A02",
+        "name": "Cryptographic Failures",
+        "severity": "HIGH",
+        "description": "Uso incorrecto de criptografía.",
+        "recommendation": "Usar algoritmos seguros y almacenar secretos en variables de entorno."
+    },
+    {
+        "id": "A03",
+        "name": "Injection",
+        "severity": "CRITICAL",
+        "description": "SQL Injection, Command Injection y otras inyecciones.",
+        "recommendation": "Usar consultas parametrizadas y validar entradas."
+    },
+    {
+        "id": "A04",
+        "name": "Insecure Design",
+        "severity": "HIGH",
+        "description": "Diseño inseguro del sistema.",
+        "recommendation": "Aplicar principios de seguridad desde el diseño."
+    },
+    {
+        "id": "A05",
+        "name": "Security Misconfiguration",
+        "severity": "HIGH",
+        "description": "Configuraciones inseguras.",
+        "recommendation": "Revisar configuraciones por defecto y endurecer el entorno."
+    },
+    {
+        "id": "A06",
+        "name": "Vulnerable Components",
+        "severity": "HIGH",
+        "description": "Dependencias vulnerables.",
+        "recommendation": "Actualizar paquetes regularmente."
+    },
+    {
+        "id": "A07",
+        "name": "Authentication Failures",
+        "severity": "CRITICAL",
+        "description": "Errores de autenticación.",
+        "recommendation": "Implementar MFA y políticas fuertes de contraseñas."
+    },
+    {
+        "id": "A08",
+        "name": "Software Integrity Failures",
+        "severity": "HIGH",
+        "description": "Problemas de integridad del software.",
+        "recommendation": "Verificar firmas y controlar la cadena de suministro."
+    },
+    {
+        "id": "A09",
+        "name": "Logging and Monitoring Failures",
+        "severity": "MEDIUM",
+        "description": "Registro y monitoreo insuficientes.",
+        "recommendation": "Registrar eventos críticos y generar alertas."
+    },
+    {
+        "id": "A10",
+        "name": "Server-Side Request Forgery",
+        "severity": "HIGH",
+        "description": "SSRF.",
+        "recommendation": "Validar y restringir solicitudes salientes."
+    }
+]

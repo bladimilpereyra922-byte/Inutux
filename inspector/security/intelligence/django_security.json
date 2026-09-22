@@ -1,0 +1,62 @@
+[
+    {
+        "setting": "DEBUG",
+        "expected": false,
+        "severity": "CRITICAL",
+        "message": "DEBUG nunca debe estar activado en producción."
+    },
+    {
+        "setting": "SECRET_KEY",
+        "expected": "ENVIRONMENT",
+        "severity": "CRITICAL",
+        "message": "SECRET_KEY debe cargarse desde variables de entorno."
+    },
+    {
+        "setting": "ALLOWED_HOSTS",
+        "expected": "NOT_EMPTY",
+        "severity": "HIGH",
+        "message": "ALLOWED_HOSTS no debe estar vacío."
+    },
+    {
+        "setting": "CSRF_COOKIE_SECURE",
+        "expected": true,
+        "severity": "HIGH",
+        "message": "CSRF_COOKIE_SECURE debe estar activado."
+    },
+    {
+        "setting": "SESSION_COOKIE_SECURE",
+        "expected": true,
+        "severity": "HIGH",
+        "message": "SESSION_COOKIE_SECURE debe estar activado."
+    },
+    {
+        "setting": "SECURE_SSL_REDIRECT",
+        "expected": true,
+        "severity": "HIGH",
+        "message": "Todo el tráfico debe redirigirse a HTTPS."
+    },
+    {
+        "setting": "SECURE_HSTS_SECONDS",
+        "expected": ">0",
+        "severity": "HIGH",
+        "message": "HSTS debe estar configurado."
+    },
+    {
+        "setting": "X_FRAME_OPTIONS",
+        "expected": "DENY",
+        "severity": "MEDIUM",
+        "message": "Evita ataques Clickjacking."
+    },
+    {
+        "setting": "SECURE_CONTENT_TYPE_NOSNIFF",
+        "expected": true,
+        "severity": "MEDIUM",
+        "message": "Evita ataques MIME Sniffing."
+    },
+    {
+        "setting": "SECURE_BROWSER_XSS_FILTER",
+        "expected": true,
+        "severity": "MEDIUM",
+        "message": "Protección adicional contra XSS en navegadores antiguos."
+    }
+]
