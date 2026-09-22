@@ -1,102 +1,203 @@
 <!DOCTYPE html>
-< lang="es">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Iniciar sesion - Unitux</title>
-    <style>
-        body{background:#08090f;color:#fff;font-family:Arial;display:flex;justify-content:center;align-items:center;min-height:100vh}
-        .tarjeta{background:#0d1117;border:1px solid #1db954;border-radius:12px;padding:40px;width:400px}
-        .logo{font-size:28px;font-weight:900;color:#00f5ff;text-align:center;margin-bottom:8px}
-        .slogan{color:#1db954;font-size:12px;text-align:center;margin-bottom:24px}
-        h2{text-align:center;margin-bottom:24px}
-        label{display:block;color:#4fc3f7;margin-bottom:4px;font-size:14px}
-        input{width:100%;padding:10px;background:#1a1a2e;border:1px solid #333;border-radius:8px;color:#fff;margin-bottom:16px}
-        .boton{width:100%;background:#1db954;color:#000;padding:12px;border:none;border-radius:8px;font-weight:700;font-size:16px;cursor:pointer}
-        a{color:#4fc3f7;display:block;text-align:center;margin-top:16px}
-        .error{color:#ff4444;font-size:12px;margin-bottom:8px}
-        .botones-sociales{display:flex;flex-direction:column;gap:12px;align-items:center;margin-top:12px}
-        
-        .btn-google-custom {
-            width: 100%;
-            max-width: 320px;
-            height: 44px;
-            background: #fff;
-            color: #000;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            text-decoration: none;
-            transition: background 0.2s;
-        }
-        .btn-google-custom:hover { background: #f1f1f1; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión | UNITUX</title>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     
-    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
-</head>
-<>
-    <div class="tarjeta">
-        <div class="logo">UNITUX</div>
-        <div class="slogan">Compras seguras y confiables</div>
-        <h2>Iniciar sesion</h2>
-        
-        <form method="post" id="djangoForm">
-            {% csrf_token %}
-            {% for field in form %}
-            <label>{{ field.label }}</label>
-            {{ field }}
-            {% for error in field.errors %}
-            <div class="error">{{ error }}</div>
-            {% endfor %}
-            {% endfor %}
-            <button type="submit" class="boton">Entrar</button>
-        </form>
-        
-        <hr style="margin:24px 0;border:0;border-top:1px solid #333">
-        <div style="text-align:center;color:#aaa;font-size:14px;margin-bottom:12px">O inicia sesion con:</div>
-        
-        <div class="botones-sociales">
-            <button type="button" onclick="ejecutarLoginGoogle()" class="btn-google-custom">
-                <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/web-24dp/logo_googleg_24dp.png" alt="Google" width="18">
-                Continuar con Google
-            </button>
-        </div>
-        <a href="/registro/">No tienes cuenta? Registrate</a>
-    </div>
+    <!-- Configuración segura de URLs para JS -->
+    <script id="app-config" type="application/json">
+        {
+            "googleLoginUrl": "{% url 'google_login' %}",
+            "registerUrl": "{% url 'registro' %}"
+        }
+    </script>
 
-    <script>
-      // Configuración de tu App de Firebase
-      const firebaseConfig = {
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            min-height: 100vh; font-family: Inter, Arial, sans-serif;
+            background: radial-gradient(circle at 10% 10%, rgba(0, 229, 255, 0.10), transparent 30%),
+                        radial-gradient(circle at 90% 90%, rgba(0, 255, 140, 0.10), transparent 30%), #070b10;
+            color: #ffffff; display: flex; align-items: center; justify-content: center; padding: 24px;
+        }
+        .login-container {
+            width: min(1050px, 100%); min-height: 650px; display: grid; grid-template-columns: 1.05fr 0.95fr;
+            background: rgba(13, 19, 27, 0.96); border: 1px solid rgba(255,255,255,0.08); border-radius: 26px;
+            overflow: hidden; box-shadow: 0 30px 100px rgba(0,0,0,.55);
+        }
+        .brand-side {
+            padding: 60px; display: flex; flex-direction: column; justify-content: center;
+            background: linear-gradient(145deg, rgba(0,255,255,.08), transparent 45%),
+                        linear-gradient(35deg, rgba(0,255,140,.07), transparent 55%);
+        }
+        .brand { font-size: 44px; font-weight: 900; letter-spacing: 4px; color: #00eaff; }
+        .brand-line { width: 90px; height: 4px; border-radius: 999px; margin: 18px 0 24px; background: linear-gradient(90deg, #00eaff, #00ef8b); }
+        .brand-side h1 { font-size: clamp(38px, 5vw, 60px); line-height: 1.03; margin-bottom: 20px; }
+        .brand-side p { color: #95a2b2; font-size: 17px; line-height: 1.7; max-width: 480px; }
+        .points { margin-top: 30px; display: grid; gap: 12px; }
+        .point { padding: 14px 16px; border-radius: 12px; background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.06); color: #d8e1eb; }
+        .form-side { display: flex; align-items: center; justify-content: center; padding: 45px; background: rgba(5, 9, 14, 0.72); }
+        .form-box { width: 100%; max-width: 410px; }
+        .form-box h2 { font-size: 34px; margin-bottom: 8px; }
+        .subtitle { color: #8996a6; margin-bottom: 28px; }
+        form { display: grid; gap: 16px; }
+        .field label { display: block; margin-bottom: 7px; font-size: 14px; color: #c8d1dc; }
+        .field input { width: 100%; padding: 15px 16px; border-radius: 12px; border: 1px solid #283442; outline: none; background: #0f1620; color: #fff; }
+        .field input:focus { border-color: #00eaff; box-shadow: 0 0 0 3px rgba(0,234,255,.08); }
+        .main-button { border: none; border-radius: 12px; padding: 15px; margin-top: 4px; background: linear-gradient(90deg, #00ef8b, #00d96f); color: #03110a; font-size: 16px; font-weight: 800; cursor: pointer; }
+        .divider { display: flex; align-items: center; gap: 12px; margin: 24px 0; color: #697687; font-size: 13px; }
+        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #202b37; }
+        .google-button { width: 100%; border: 1px solid #d9dee5; background: #ffffff; color: #111111; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; }
+        .google-button:disabled { opacity: .65; cursor: wait; }
+        .register-link { display: block; text-align: center; margin-top: 24px; color: #00eaff; text-decoration: none; }
+        .error { margin-top: 5px; color: #ff6b6b; font-size: 13px; }
+        .firebase-error { margin-top: 14px; padding: 12px; border-radius: 10px; background: rgba(255, 70, 70, .08); border: 1px solid rgba(255, 70, 70, .18); color: #ff9090; font-size: 13px; display: none; }
+        @media (max-width: 820px) { .login-container { grid-template-columns: 1fr; } .brand-side { display: none; } .form-side { padding: 30px 20px; } }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <section class="brand-side">
+        <div class="brand">UNITUX</div>
+        <div class="brand-line"></div>
+        <h1>Compra mejor.<br>Compra seguro.</h1>
+        <p>Accede a tu cuenta y disfruta una experiencia de compra moderna, rápida y confiable.</p>
+        <div class="points">
+            <div class="point">✓ Compras protegidas</div>
+            <div class="point">✓ Vendedores verificados</div>
+            <div class="point">✓ Soporte para clientes</div>
+        </div>
+    </section>
+    <section class="form-side">
+        <div class="form-box">
+            <h2>Bienvenido</h2>
+            <p class="subtitle">Inicia sesión en tu cuenta UNITUX.</p>
+            <form method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="field">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}<div class="error">{{ error }}</div>{% endfor %}
+                    </div>
+                {% endfor %}
+                {% if form.non_field_errors %}{% for error in form.non_field_errors %}<div class="error">{{ error }}</div>{% endfor %}{% endif %}
+                <button type="submit" class="main-button">Iniciar sesión</button>
+            </form>
+            <div class="divider">O continúa con</div>
+            <button type="button" id="googleButton" class="google-button">Continuar con Google</button>
+            <div id="firebaseError" class="firebase-error"></div>
+            <a href="#" id="registerLink" class="register-link">¿No tienes cuenta? Crear cuenta</a>
+        </div>
+    </section>
+</div>
+<script>
+    // Cargar configuración desde el script JSON seguro
+    const config = JSON.parse(document.getElementById('app-config').textContent);
+    document.getElementById('registerLink').href = config.registerUrl;
+
+    const firebaseConfig = {
         apiKey: "AIzaSyBRLwa4YsHq82L4tyKFPkQqUX__-as4BBo",
         authDomain: "unitux-c7b8b.firebaseapp.com",
         projectId: "unitux-c7b8b",
         storageBucket: "unitux-c7b8b.appspot.com",
         messagingSenderId: "551444650101",
         appId: "1:551444650101:web:ddf8ba43b5df5104de3d95"
-      };
+    };
+    
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    
+    const auth = firebase.auth();
+    const googleButton = document.getElementById("googleButton");
+    const firebaseError = document.getElementById("firebaseError");
+    
+    function mostrarError(mensaje) {
+        firebaseError.textContent = mensaje;
+        firebaseError.style.display = "block";
+    }
 
-      // Inicialización
-      firebase.initializeApp(firebaseConfig);
-      
-      function ejecutarLoginGoogle() {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithRedirect(provider);
-      }
+    // Detección automática de entorno para elegir el método correcto
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' || 
+                       window.location.port !== '';
 
-      // Al retornar de Google, procesa el token y se lo envía limpio a Django
-      firebase.auth().getRedirectResult().then((result) => {
-        if (result && result.user) {
-          result.user.getIdToken().then((idToken) => {
-            window.location.href = "/google-login/?token=" + idToken;
-          });
+    googleButton.addEventListener("click", async () => {
+        firebaseError.style.display = "none";
+        googleButton.disabled = true;
+        googleButton.textContent = isLocalhost ? "Abriendo Google..." : "Redirigiendo a Google...";
+        
+        try {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: "select_account" });
+            
+            let result;
+            if (isLocalhost) {
+                // En desarrollo local usamos Popup para evitar recargas fallidas
+                result = await auth.signInWithPopup(provider);
+            } else {
+                // En producción (Render/Dominio propio) usamos Redirect por seguridad
+                await auth.signInWithRedirect(provider);
+                return; // El flujo continúa al recargar la página
+            }
+            
+            // Procesamiento inmediato solo para Popup (Localhost)
+            await procesarToken(result.user);
+            
+        } catch (error) {
+            console.error("Firebase Error:", error);
+            mostrarError(error.message || "No fue posible iniciar sesión.");
+            googleButton.disabled = false;
+            googleButton.textContent = "Continuar con Google";
         }
-      }).catch((error) => {
-        console.error("Error en Firebase Auth:", error);
-      });
-    </script>
+    });
+
+    // Manejo exclusivo para Redirect (Producción)
+    if (!isLocalhost) {
+        auth.getRedirectResult().then(async (result) => {
+            if (!result || !result.user) return;
+            await procesarToken(result.user);
+        }).catch((error) => {
+            console.error("Redirect Error:", error);
+            mostrarError(error.message || "Error al completar el acceso.");
+            googleButton.disabled = false;
+            googleButton.textContent = "Continuar con Google";
+        });
+    }
+
+    // Función centralizada para enviar token al backend Django
+    async function procesarToken(user) {
+        googleButton.textContent = "Verificando credenciales...";
+        try {
+            const idToken = await user.getIdToken(true);
+            const csrfToken = document.querySelector("[name='csrfmiddlewaretoken']").value;
+            
+            const response = await fetch(config.googleLoginUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+                    "X-CSRFToken": csrfToken
+                },
+                body: new URLSearchParams({ token: idToken })
+            });
+            
+            const data = await response.json();
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || "Error al verificar con UNITUX.");
+            }
+            
+            window.location.href = data.redirect || "/";
+            
+        } catch (err) {
+            console.error("Backend Error:", err);
+            mostrarError(err.message || "Fallo en la comunicación con el servidor.");
+            googleButton.disabled = false;
+            googleButton.textContent = "Continuar con Google";
+        }
+    }
+</script>
+</body>
+</html>
