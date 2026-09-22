@@ -1,7 +1,6 @@
-firebase-key.json
-venv/
-__pycache__/
+﻿__pycache__/
 *.pyc
-db.sqlite3
+*.bak
 .env
-firebase-credentials.json
+venv/
+node_modules/
