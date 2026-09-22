@@ -83,3 +83,15 @@ def pago(request):
     total_formateado = f"{total_calculado:.2f}" if total_calculado else "0.00"
 
     return render(request, "tienda/pago.html", {"total": total_formateado})
+
+def detalle_producto(request, pk):
+    """Vista para mostrar el detalle de un producto."""
+    from django.shortcuts import get_object_or_404
+    
+    producto = get_object_or_404(Producto, pk=pk, activo=True)
+    
+    return render(
+        request, 
+        "tienda/detalle_producto.html", 
+        {"producto": producto}
+    )
