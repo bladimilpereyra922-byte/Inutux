@@ -1,0 +1,14 @@
+{% extends "base_cyber.html" %}
+{% block title %}{{ producto.nombre }} | UNITUX{% endblock %}
+{% block content %}
+<div class="min-h-screen flex items-center justify-center p-6">
+    <div class="max-w-4xl w-full bg-cyber-card rounded-2xl border border-white/10 p-8">
+        <h1 class="text-3xl font-outfit font-bold text-white mb-4">{{ producto.nombre }}</h1>
+        <p class="text-cyber-emerald text-2xl font-bold">${{ producto.precio }}</p>
+        <p class="text-cyber-muted mt-4">{{ producto.descripcion|default:"Sin descripción disponible." }}</p>
+        <a href="/" class="inline-block mt-6 px-6 py-3 bg-cyber-cyan text-black font-bold rounded-xl hover:bg-white transition-colors">
+            ← Volver al inicio
+        </a>
+    </div>
+</div>
+{% endblock %}
