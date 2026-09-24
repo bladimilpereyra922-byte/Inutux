@@ -1,12 +1,14 @@
-import json
+﻿import json
 import os
 
 import firebase_admin
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from firebase_admin import credentials
 
-from .models import Carrito, Producto, Proveedor
+from carrito.models import Carrito
+from catalogo.models import Producto
+from proveedores.models import Proveedor
 
 # ---------------------------------------------------------------------------
 # Inicialización segura de Firebase Admin SDK (Render + Local)
@@ -84,14 +86,13 @@ def pago(request):
 
     return render(request, "tienda/pago.html", {"total": total_formateado})
 
+
 def detalle_producto(request, pk):
     """Vista para mostrar el detalle de un producto."""
-    from django.shortcuts import get_object_or_404
-    
     producto = get_object_or_404(Producto, pk=pk, activo=True)
-    
+
     return render(
-        request, 
-        "tienda/detalle_producto.html", 
-        {"producto": producto}
+        request,
+        "tienda/detalle_producto.html",
+        {"producto": producto},
     )
