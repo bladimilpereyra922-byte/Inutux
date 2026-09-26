@@ -1,68 +1,473 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}UNITUX | Compras Seguras{% endblock %}</title>
+    <title>{% block title %}UNITUX - Compras Seguras{% endblock %}</title>
     
-    <!-- Fuentes Outfit y Plus Jakarta Sans -->
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Material Symbols -->
+    <!-- Material Symbols Outlined -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     
-    <!-- Tailwind CSS CDN (Para desarrollo rápido sin build step) -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configuración Tailwind personalizada (Fiel a index.css y React) -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        'outfit': ['Outfit', 'sans-serif'],
+                        'jakarta': ['Plus Jakarta Sans', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    },
                     colors: {
                         cyber: {
-                            bg: '#05070B',
-                            card: '#191c21',
-                            dark: '#0b0e13',
+                            dark: '#05070B',
+                            card: '#101319',
+                            surface: '#191c21',
                             cyan: '#00F0FF',
                             emerald: '#05E777',
-                            text: '#e1e2ea',
-                            muted: '#849495'
+                            muted: '#849495',
+                            text: '#E1E2EA',
+                            border: 'rgba(59, 73, 75, 0.4)',
                         }
                     },
-                    fontFamily: {
-                        outfit: ['Outfit', 'sans-serif'],
-                        jakarta: ['Plus Jakarta Sans', 'sans-serif']
+                    animation: {
+                        'ping-slow': 'ping 3s cubic-bezier(0, 0, 0.2, 1) infinite',
+                        'fade-in': 'fadeIn 0.2s ease-out forwards',
                     },
-                    boxShadow: {
-                        'glow-cyan': '0 0 24px -4px rgba(0, 240, 255, 0.25)',
-                        'glow-emerald': '0 0 20px -4px rgba(5, 231, 119, 0.3)'
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(-10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
                     }
                 }
             }
         }
     </script>
-
-    <style>
-        body { 
-            background-color: #05070B; 
-            color: #e1e2ea; 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-        }
-        h1, h2, h3, .font-outfit { font-family: 'Outfit', sans-serif; }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* Animaciones base */
-        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-        .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col">
-    {% block content %}{% endblock %}
     
-    <!-- Scripts globales si fueran necesarios -->
-    {% block extra_js %}{% endblock %}
+    <!-- Estilos personalizados Cyber-Luxe -->
+    <style>
+        body {
+            background-color: #05070B;
+            color: #E1E2EA;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, .font-headline, .font-outfit {
+            font-family: 'Outfit', sans-serif;
+        }
+        
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+            line-height: 1;
+        }
+        
+        .material-symbols-outlined.fill-1 {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .glass-header {
+            background: rgba(11, 14, 19, 0.85);
+            backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(59, 73, 75, 0.3);
+            box-shadow: 0 4px 32px rgba(0, 240, 255, 0.05);
+        }
+        
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #05070B;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 240, 255, 0.3);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 240, 255, 0.5);
+        }
+    </style>
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-cyber-dark min-h-screen pb-24 md:pb-0 selection:bg-cyber-cyan selection:text-[#002022]">
+    
+    <!-- Top App Bar Navigation -->
+    <header class="sticky top-0 z-50 w-full glass-header transition-all">
+        <div class="flex justify-between items-center w-full px-4 py-3 max-w-[1360px] mx-auto">
+            
+            <!-- Brand & Security Shield -->
+            <div onclick="window.location.href='/'" class="flex items-center gap-2.5 cursor-pointer group select-none">
+                <div class="relative flex items-center justify-center w-9 h-9 rounded-xl bg-[#1d2025] border border-cyber-cyan/30 shadow-[0_0_12px_rgba(0,240,255,0.25)] group-hover:border-cyber-cyan/60 transition-all">
+                    <span class="material-symbols-outlined text-cyber-cyan text-xl fill-1">shield_with_heart</span>
+                    <span class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-cyber-emerald animate-ping"></span>
+                    <span class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-cyber-emerald"></span>
+                </div>
+                <div class="flex flex-col">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xl font-bold tracking-wider text-cyber-cyan font-outfit">UNITUX</span>
+                    </div>
+                    <span class="text-[10px] text-cyber-emerald tracking-tight -mt-0.5 flex items-center gap-1 font-medium">
+                        <span class="w-1 h-1 rounded-full bg-cyber-emerald"></span>
+                        Compras seguras y confiables
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Quick Nav Links (Desktop) & User Actions -->
+            <div class="flex items-center gap-3">
+                
+                <!-- Desktop Nav Links -->
+                <div class="hidden md:flex items-center gap-5 mr-1">
+                    <a href="/" class="text-sm font-medium transition-colors text-cyber-cyan font-semibold">Inicio</a>
+                    <a href="/catalogo/" class="text-sm font-medium transition-colors text-cyber-muted hover:text-[#dbfcff]">Explorar Categorías</a>
+                    <button onclick="document.getElementById('support-modal').classList.remove('hidden')" class="text-sm font-medium text-cyber-muted hover:text-cyber-cyan transition-colors flex items-center gap-1">
+                        <span class="material-symbols-outlined text-base">headset_mic</span>
+                        Soporte
+                    </button>
+                    <button onclick="document.getElementById('store-modal').classList.remove('hidden')" class="text-sm font-medium text-cyber-emerald hover:text-[#7dffa2] transition-colors flex items-center gap-1">
+                        <span class="material-symbols-outlined text-base">storefront</span>
+                        Mi tienda
+                    </button>
+                </div>
+                
+                <!-- Desktop Cart Shortcut -->
+                <a href="/carrito/" class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyber-surface border border-cyber-border hover:border-cyber-cyan/40 text-cyber-muted hover:text-cyber-cyan transition-all relative active:scale-95" title="Ver carrito de compras">
+                    <span class="material-symbols-outlined text-lg">shopping_cart</span>
+                    <span class="text-xs font-semibold">Carrito</span>
+                    {% if carrito_count and carrito_count > 0 %}
+                    <span class="bg-cyber-emerald text-[#003918] font-bold text-[10px] w-4 h-4 rounded-full flex items-center justify-center shadow-[0_0_8px_rgba(5,231,119,0.7)] ml-1">
+                        {{ carrito_count }}
+                    </span>
+                    {% endif %}
+                </a>
+                
+                <!-- Notification Button -->
+                <div class="relative">
+                    <button id="notif-btn" class="relative p-2 rounded-lg bg-cyber-surface/80 hover:bg-[#272a30] text-cyber-muted hover:text-cyber-cyan border border-cyber-border transition-all active:scale-95" title="Notificaciones de seguridad">
+                        <span class="material-symbols-outlined text-lg">notifications</span>
+                        <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyber-emerald shadow-[0_0_6px_rgba(5,231,119,0.9)] animate-pulse"></span>
+                    </button>
+                    
+                    <!-- Notification Dropdown -->
+                    <div id="notif-dropdown" class="hidden absolute right-0 mt-2 w-80 rounded-xl bg-cyber-card border border-cyber-cyan/30 shadow-2xl p-3 z-50 animate-fade-in">
+                        <div class="flex items-center justify-between pb-2 border-b border-cyber-border">
+                            <div class="flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-cyber-emerald text-base fill-1">verified_user</span>
+                                <span class="text-xs font-bold text-cyber-text">Notificaciones de Bóveda</span>
+                            </div>
+                            <button onclick="document.getElementById('notif-dropdown').classList.add('hidden')" class="text-[11px] text-cyber-cyan hover:underline">Cerrar</button>
+                        </div>
+                        <div class="space-y-2 mt-2 text-xs">
+                            <div class="p-2 rounded-lg bg-cyber-surface border border-white/5">
+                                <div class="flex items-center justify-between font-semibold text-cyber-cyan">
+                                    <span>Pedido UN-98214</span>
+                                    <span class="text-[10px] text-cyber-muted">Hace 15m</span>
+                                </div>
+                                <p class="text-[11px] text-cyber-muted mt-0.5">En reparto express 24h con código criptográfico activado.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if user.is_authenticated %}
+                    <!-- User Greeting & Avatar -->
+                    <div onclick="window.location.href='/perfil/'" class="flex items-center gap-2 pl-2 border-l border-cyber-border cursor-pointer group">
+                        <div class="flex flex-col text-right hidden sm:flex">
+                            <span class="text-[11px] text-cyber-muted">Hola,</span>
+                            <span class="text-xs text-cyber-text font-semibold max-w-[120px] truncate group-hover:text-cyber-cyan transition-colors">
+                                {{ user.first_name|default:user.username }}
+                            </span>
+                        </div>
+                        <div class="relative group active:scale-95 transition-transform duration-150">
+                            <div class="w-9 h-9 rounded-full p-[1.5px] bg-gradient-to-tr from-cyber-cyan via-cyber-emerald to-[#32353b] shadow-[0_0_10px_rgba(0,240,255,0.3)]">
+                                <div class="w-full h-full rounded-full bg-cyber-dark flex items-center justify-center overflow-hidden">
+                                    <img class="w-full h-full object-cover" 
+                                         src="https://ui-avatars.com/api/?name={{ user.first_name|default:user.username }}&background=0D9488&color=fff&size=128" 
+                                         alt="{{ user.username }} avatar" />
+                                </div>
+                            </div>
+                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-cyber-emerald border-2 border-cyber-dark"></span>
+                        </div>
+                        
+                        <!-- Fast Logout Button -->
+                        <button onclick="document.getElementById('exit-modal').classList.remove('hidden')" 
+                                class="p-1.5 rounded-lg bg-cyber-surface/70 border border-cyber-border text-cyber-muted hover:text-[#ffb4ab] hover:border-[#ffb4ab]/40 transition-colors active:scale-95 ml-0.5" 
+                                title="Cerrar sesión / Salir">
+                            <span class="material-symbols-outlined text-lg">logout</span>
+                        </button>
+                    </div>
+                {% else %}
+                    <!-- Auth Buttons for Non-Logged Users -->
+                    <div class="hidden md:flex items-center gap-2">
+                        <a href="/login/" class="text-sm font-medium text-cyber-muted hover:text-cyber-cyan transition-colors">Iniciar Sesión</a>
+                        
+                        <!-- ✅ BOTÓN GOOGLE DESKTOP CORREGIDO (Firebase JS) -->
+                        <button type="button" onclick="handleGoogleLogin()" 
+                                class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyber-surface border border-cyber-border hover:border-cyber-cyan/40 text-cyber-muted hover:text-cyber-cyan transition-all active:scale-95 cursor-pointer">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                            </svg>
+                            <span class="text-xs font-semibold">Google</span>
+                        </button>
+                    </div>
+                {% endif %}
+                
+                <!-- Mobile Menu Toggle -->
+                <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-cyber-muted hover:text-cyber-cyan transition-colors">
+                    <span class="material-symbols-outlined text-2xl">menu</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-cyber-border bg-cyber-card/95 backdrop-blur-xl">
+            <div class="px-4 py-3 space-y-2">
+                <a href="/" class="flex items-center gap-2 text-sm font-medium text-cyber-cyan py-2">
+                    <span class="material-symbols-outlined">storefront</span> Inicio
+                </a>
+                <a href="/catalogo/" class="flex items-center gap-2 text-sm font-medium text-cyber-muted hover:text-cyber-cyan py-2">
+                    <span class="material-symbols-outlined">explore</span> Explorar Categorías
+                </a>
+                <button onclick="document.getElementById('support-modal').classList.remove('hidden'); document.getElementById('mobile-menu').classList.add('hidden')" class="w-full flex items-center gap-2 text-sm font-medium text-cyber-muted hover:text-cyber-cyan py-2 text-left">
+                    <span class="material-symbols-outlined">headset_mic</span> Soporte 24/7
+                </button>
+                <button onclick="document.getElementById('store-modal').classList.remove('hidden'); document.getElementById('mobile-menu').classList.add('hidden')" class="w-full flex items-center gap-2 text-sm font-medium text-cyber-emerald hover:text-[#7dffa2] py-2 text-left">
+                    <span class="material-symbols-outlined">storefront</span> Mi Tienda
+                </button>
+                <a href="/carrito/" class="flex items-center gap-2 text-sm font-medium text-cyber-muted hover:text-cyber-cyan py-2">
+                    <span class="material-symbols-outlined">shopping_cart</span> Carrito
+                    {% if carrito_count and carrito_count > 0 %}
+                    <span class="bg-cyber-emerald text-[#003918] text-[10px] font-bold px-1.5 py-0.5 rounded-full">{{ carrito_count }}</span>
+                    {% endif %}
+                </a>
+                
+                {% if not user.is_authenticated %}
+                    <div class="pt-2 border-t border-cyber-border space-y-2">
+                        <a href="/login/" class="block text-center text-sm font-medium text-cyber-muted hover:text-cyber-cyan py-2">Iniciar Sesión</a>
+                        <a href="/registro/" class="block text-center text-sm font-medium text-cyber-emerald hover:text-[#7dffa2] py-2">Crear Cuenta</a>
+                        <a href="/recuperar-password/" class="block text-center text-xs text-cyber-muted hover:text-cyber-text py-1">¿Olvidaste tu contraseña?</a>
+                        
+                        <!-- ✅ BOTÓN GOOGLE MOBILE CORREGIDO (Firebase JS) -->
+                        <button type="button" onclick="handleGoogleLogin()" 
+                                class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-cyber-surface border border-cyber-border hover:border-cyber-cyan/40 text-cyber-muted hover:text-cyber-cyan transition-all active:scale-95 cursor-pointer">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                            </svg>
+                            <span class="text-xs font-semibold">Continuar con Google</span>
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content Area -->
+    <main class="relative z-10 min-h-[80vh]">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="mt-16 pt-8 pb-10 border-t border-cyber-border bg-[#0b0e13]/60 relative z-10 text-xs text-cyber-muted">
+        <div class="max-w-[1360px] mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-lg bg-[#1d2025] border border-cyber-cyan/30 flex items-center justify-center text-cyber-cyan">
+                    <span class="material-symbols-outlined text-sm fill-1">shield_lock</span>
+                </div>
+                <span class="font-bold text-cyber-text font-outfit">UNITUX</span>
+                <span>· Compras seguras, fondos en custodia y verificación técnica en 24h</span>
+            </div>
+            <div class="flex items-center gap-4 text-[#b9cacb]">
+                <button onclick="document.getElementById('support-modal').classList.remove('hidden')" class="hover:text-cyber-cyan transition-colors">Garantía y Devoluciones</button>
+                <span>·</span>
+                <button onclick="document.getElementById('store-modal').classList.remove('hidden')" class="hover:text-cyber-emerald transition-colors">Vender en UNITUX</button>
+                <span>·</span>
+                <span>Red Descentralizada © 2026</span>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Exit Confirmation Modal -->
+    <div id="exit-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+        <div class="bg-cyber-card border border-[#ffb4ab]/40 rounded-2xl max-w-sm w-full p-5 shadow-2xl">
+            <div class="flex items-center gap-3 text-[#ffb4ab] mb-3">
+                <span class="material-symbols-outlined text-2xl">logout</span>
+                <h3 class="text-lg font-bold font-outfit text-cyber-text">¿Deseas salir de UNITUX?</h3>
+            </div>
+            <p class="text-xs text-cyber-muted leading-relaxed">
+                Tus compras en curso y fondos en custodia garantizada continuarán protegidos por la bóveda criptográfica.
+            </p>
+            <div class="flex items-center justify-end gap-2.5 mt-5">
+                <button onclick="document.getElementById('exit-modal').classList.add('hidden')" class="px-4 py-2 text-xs font-semibold rounded-xl bg-cyber-surface text-cyber-muted hover:text-white border border-cyber-border">Permanecer conectado</button>
+                <form method="post" action="/logout/" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="px-4 py-2 text-xs font-bold rounded-xl bg-[#93000a] hover:bg-[#ffb4ab] text-white hover:text-[#690005] transition-colors">Cerrar Sesión</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Placeholder Modals -->
+    <div id="support-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+        <div class="bg-cyber-card border border-cyber-cyan/40 rounded-2xl max-w-xl w-full p-6 shadow-2xl relative">
+            <button onclick="this.closest('.fixed').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-cyber-surface border border-cyber-border text-cyber-muted hover:text-white flex items-center justify-center">
+                <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+            <div class="flex items-center gap-3 pb-4 border-b border-cyber-border">
+                <div class="w-10 h-10 rounded-xl bg-cyber-cyan/15 border border-cyber-cyan/30 flex items-center justify-center text-cyber-cyan">
+                    <span class="material-symbols-outlined text-2xl">headset_mic</span>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold font-outfit text-cyber-text">Centro de Asistencia UNITUX</h3>
+                    <p class="text-xs text-cyber-muted">Soporte prioritario 24/7</p>
+                </div>
+            </div>
+            <div class="h-64 flex items-center justify-center text-cyber-muted text-sm">
+                Chat de soporte integrado aquí...
+            </div>
+        </div>
+    </div>
+
+    <div id="store-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+        <div class="bg-cyber-card border border-cyber-emerald/40 rounded-2xl max-w-xl w-full p-6 shadow-2xl relative">
+            <button onclick="this.closest('.fixed').classList.add('hidden')" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-cyber-surface border border-cyber-border text-cyber-muted hover:text-white flex items-center justify-center">
+                <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+            <div class="flex items-center gap-3 pb-4 border-b border-cyber-border">
+                <div class="w-10 h-10 rounded-xl bg-cyber-emerald/15 border border-cyber-emerald/30 flex items-center justify-center text-cyber-emerald">
+                    <span class="material-symbols-outlined text-2xl">storefront</span>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold font-outfit text-cyber-text">Mi Tienda UNITUX</h3>
+                    <p class="text-xs text-cyber-muted">Gestión de inventario y ventas</p>
+                </div>
+            </div>
+            <div class="h-64 flex items-center justify-center text-cyber-muted text-sm">
+                Panel de vendedor integrado aquí...
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts Base -->
+    <script>
+        // Toggle menú mobile
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+        
+        // Toggle Notificaciones
+        const notifBtn = document.getElementById('notif-btn');
+        const notifDropdown = document.getElementById('notif-dropdown');
+        if (notifBtn && notifDropdown) {
+            notifBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                notifDropdown.classList.toggle('hidden');
+            });
+            document.addEventListener('click', () => {
+                notifDropdown.classList.add('hidden');
+            });
+        }
+    </script>
+    
+    <!-- ✅ FIREBASE AUTH SCRIPT (Solución definitiva para Google Login) -->
+    {% block extra_scripts %}
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script>
+        // Configuración de Firebase (REEMPLAZAR CON TUS DATOS REALES DE FIREBASE CONSOLE)
+        const firebaseConfig = {
+            apiKey: "{{ FIREBASE_API_KEY|default:'TU_API_KEY_AQUI' }}",
+            authDomain: "{{ FIREBASE_AUTH_DOMAIN|default:'tu-proyecto.firebaseapp.com' }}",
+            projectId: "{{ FIREBASE_PROJECT_ID|default:'tu-proyecto' }}",
+        };
+
+        // Inicializar solo si no está inicializado
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        async function handleGoogleLogin() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            
+            try {
+                // Abrir popup y esperar resultado
+                const result = await firebase.auth().signInWithPopup(provider);
+                const token = await result.user.getIdToken();
+                
+                // Enviar token a Django vía fetch POST
+                const response = await fetch('/google-login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken'),
+                    },
+                    body: JSON.stringify({ token: token }),
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.redirect) {
+                    window.location.href = data.redirect;
+                } else {
+                    console.error('Error en login:', data.error);
+                    alert('Error al iniciar sesión: ' + (data.error || 'Inténtalo de nuevo'));
+                }
+            } catch (error) {
+                if (error.code === 'auth/popup-closed-by-user') {
+                    console.log('Usuario cerró el popup');
+                } else {
+                    console.error('Error Firebase:', error);
+                    alert('Error de autenticación: ' + error.message);
+                }
+            }
+        }
+
+        // Helper para obtener CSRF cookie si no hay tag en DOM
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+    {% endblock %}
 </body>
 </html>

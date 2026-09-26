@@ -46,7 +46,7 @@ def inicio(request):
     if busqueda:
         productos = productos.filter(nombre__icontains=busqueda)
 
-    productos_destacados = productos.order_by("-creado_en")[:8]
+    productos_destacados = productos.order_by("-creado")[:8]
 
     return render(
         request,
