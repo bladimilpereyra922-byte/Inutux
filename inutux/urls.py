@@ -2,7 +2,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.http import JsonResponse
-from django.urls import include, path
+from django.urls import path
 
 from api import views as api_views
 from carrito import views as carrito_views
@@ -14,10 +14,9 @@ from usuarios import views as usuarios_views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # ✅ APIs para conectar con React (Notificaciones y Cupones)
+    # ✅ APIs Centralizadas (Sin include redundante)
     path("api/notifications/", api_views.get_notifications, name="api_notifications"),
     path("api/apply-promo/", api_views.apply_promo, name="api_apply_promo"),
-    path("api/", include("api.urls")),
     # Inicio y Catálogo
     path("", catalogo_views.inicio, name="inicio"),
     path("catalogo/", catalogo_views.inicio, name="catalogo"),
@@ -34,12 +33,12 @@ urlpatterns = [
         carrito_views.eliminar_carrito,
         name="eliminar_carrito",
     ),
-    # Usuarios (Ordenadas alfabéticamente por ruta)
+    # Usuarios
     path("google-login/", usuarios_views.google_login, name="google_login"),
     path("login/", usuarios_views.login_view, name="login"),
     path("logout/", usuarios_views.logout_view, name="logout"),
-    # ⚠️ NOTA: Perfil debe apuntar a una vista real de perfil cuando se cree.
-    # Por ahora mantiene login_view para evitar 404, pero NO es lo ideal en producción.
+    # ️ PERFIL: Mantiene login_view temporalmente.
+    # CRÍTICO: Debes crear 'usuarios_views.perfil_view' ASAP.
     path("perfil/", usuarios_views.login_view, name="perfil"),
     path(
         "recuperar-password/",
@@ -59,8 +58,10 @@ urlpatterns = [
         proveedores_views.registro_proveedor,
         name="registro_proveedor",
     ),
-    # Soporte IA
+    # Soporte IA (Agente UNITUX)
     path("soporte/", soporte_views.chat_soporte, name="chat_soporte"),
+    path("soporte/api-chat/", soporte_views.api_chat_ia, name="api_chat_ia"),
+    # Legacy / Placeholder
     path(
         "soporte-ia/", lambda r: JsonResponse({"status": "ok"}), name="soporte_ia_api"
     ),
