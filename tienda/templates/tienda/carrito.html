@@ -1,60 +1,53 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Carrito - Unitux</title>
-    <style>
-        body{background:#08090f;color:#fff;font-family:Arial}
-        header{background:#0d1117;padding:16px 40px;border-bottom:1px solid #1db954;display:flex;justify-content:space-between;align-items:center}
-        .logo{font-size:28px;font-weight:900;color:#00f5ff}
-        .slogan{color:#1db954;font-size:12px}
-        .contenido{max-width:800px;margin:40px auto;padding:0 20px}
-        h2{margin-bottom:24px;color:#fff}
-        .item{background:#0d1117;border:1px solid #1a1a2e;border-radius:12px;padding:16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
-        .item-nombre{font-size:16px;font-weight:700}
-        .item-precio{color:#1db954;font-size:18px;font-weight:700}
-        .btn-eliminar{background:#ff4444;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-size:14px}
-        .total{background:#0d1117;border:1px solid #1db954;border-radius:12px;padding:24px;text-align:right;margin-top:24px}
-        .total-precio{color:#1db954;font-size:28px;font-weight:900}
-        .btn-pago{display:block;background:#1db954;color:#000;text-align:center;padding:14px;border-radius:8px;text-decoration:none;font-weight:700;font-size:16px;margin-top:16px}
-        .vacio{text-align:center;padding:80px;color:#4fc3f7}
-    </style>
-</head>
-<body>
-    <header>
-        <div>
-            <div class="logo">UNITUX</div>
-            <div class="slogan">Compras seguras y confiables</div>
-        </div>
-        <a href="/" style="color:#4fc3f7;text-decoration:none">Volver a la tienda</a>
-    </header>
-    <div class="contenido">
-        <h2>Mi carrito</h2>
-        {% if carrito.items.all %}
-        {% for item in carrito.items.all %}
-        <div class="item">
-            <div>
-                <div class="item-nombre">{{ item.producto.nombre }}</div>
-                <div style="color:#aaa;font-size:14px">Cantidad: {{ item.cantidad }}</div>
-                <div style="color:#aaa;font-size:14px">Vendido por: {{ item.producto.proveedor.nombre_tienda }}</div>
+{% extends "base_cyber.html" %}
+
+{% block title %}Mi Carrito - UNITUX{% endblock %}
+
+{% block content %}
+<div class="max-w-[1360px] mx-auto px-4 py-8 min-h-screen">
+    <h1 class="text-3xl font-bold text-cyber-text font-outfit mb-8">Tu Carrito</h1>
+    
+    {% if carrito.items.exists %}
+        <div class="space-y-4">
+            {% for item in carrito.items.all %}
+            <div class="bg-cyber-card border border-cyber-border rounded-xl p-4 flex items-center justify-between">
+                <div>
+                    <h3 class="text-cyber-text font-semibold">{{ item.producto.nombre }}</h3>
+                    <p class="text-cyber-muted text-sm">Cantidad: {{ item.cantidad }}</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-cyber-emerald font-bold">${{ item.producto.precio|floatformat:2 }}</span>
+                    <a href="{% url 'eliminar_carrito' item.pk %}" 
+                       class="text-[#ffb4ab] hover:text-red-500 transition-colors">
+                        <span class="material-symbols-outlined">delete</span>
+                    </a>
+                </div>
             </div>
-            <div style="text-align:right">
-                <div class="item-precio">${{ item.subtotal }}</div>
-                <a href="/carrito/eliminar/{{ item.pk }}/" class="btn-eliminar">Eliminar</a>
+            {% endfor %}
+        </div>
+        
+        <!-- Total del Carrito -->
+        <div class="mt-8 pt-6 border-t border-cyber-border flex justify-end">
+            <div class="text-right">
+                <p class="text-cyber-muted text-sm">Total estimado</p>
+                <p class="text-2xl font-bold text-cyber-cyan font-outfit">
+                    ${{ carrito.total|floatformat:2 }}
+                </p>
             </div>
         </div>
-        {% endfor %}
-        <div class="total">
-            <div style="color:#aaa;margin-bottom:8px">Total de tu compra</div>
-            <div class="total-precio">${{ carrito.total }}</div>
-            <a href="/pago/" class="btn-pago">Proceder al pago</a>
+    {% else %}
+        <!-- Estado Vacío Profesional -->
+        <div class="flex flex-col items-center justify-center py-20 text-center">
+            <div class="w-16 h-16 rounded-2xl bg-cyber-surface border border-cyber-border flex items-center justify-center mb-4">
+                <span class="material-symbols-outlined text-3xl text-cyber-muted">shopping_cart_off</span>
+            </div>
+            <h3 class="text-lg font-bold text-cyber-text mb-2">Tu carrito está vacío</h3>
+            <p class="text-sm text-cyber-muted max-w-md mb-6">
+                Explora nuestro catálogo Cyber-Luxe y encuentra productos exclusivos verificados.
+            </p>
+            <a href="/catalogo/" class="px-6 py-3 rounded-xl bg-cyber-cyan text-[#002022] font-bold hover:bg-[#7df9ff] transition-colors">
+                Explorar Catálogo
+            </a>
         </div>
-        {% else %}
-        <div class="vacio">
-            <h2>Tu carrito esta vacio</h2>
-            <a href="/" style="color:#1db954">Ver productos</a>
-        </div>
-        {% endif %}
-    </div>
-</body>
-</html>
+    {% endif %}
+</div>
+{% endblock %}

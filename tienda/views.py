@@ -56,6 +56,7 @@ def inicio(request):
             "busqueda": busqueda,
         },
     )
+    
 
 
 @login_required

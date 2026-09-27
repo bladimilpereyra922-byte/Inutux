@@ -3,24 +3,76 @@
 {% block title %}UNITUX - Compras Seguras y Confiables{% endblock %}
 
 {% block content %}
-<div class="min-h-screen p-6">
-    <h1 class="text-4xl font-bold text-cyan-400 mb-8">Bienvenido a UNITUX</h1>
+<div class="max-w-[1360px] mx-auto px-4 py-8 min-h-screen">
     
-    {% if busqueda %}
-        <p class="text-emerald-400 mb-4">Resultados para: "{{ busqueda }}"</p>
-    {% endif %}
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {% for producto in productos_destacados %}
-        <a href="/producto/{{ producto.pk }}/" class="block bg-gray-900 border border-cyan-500/30 rounded-xl p-4 hover:border-cyan-400 transition-colors">
-            <h3 class="text-white font-bold mb-2">{{ producto.nombre }}</h3>
-            <p class="text-emerald-400 text-lg">${{ producto.precio }}</p>
-            {% if producto.descripcion %}
-                <p class="text-gray-400 text-sm mt-2 line-clamp-2">{{ producto.descripcion }}</p>
+    <!-- Header de Sección -->
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-bold text-cyber-text font-outfit tracking-tight">
+            {% if busqueda %}
+                Resultados para: <span class="text-cyber-cyan">"{{ busqueda }}"</span>
+            {% else %}
+                Explorar Catálogo
             {% endif %}
+        </h1>
+        
+        {% if not busqueda %}
+        <div class="hidden md:flex items-center gap-2 text-xs text-cyber-muted">
+            <span class="w-2 h-2 rounded-full bg-cyber-emerald animate-pulse"></span>
+            Productos verificados en tiempo real
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Grid de Productos Cyber-Luxe -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {% for producto in productos_destacados %}
+        <a href="/producto/{{ producto.pk }}/" 
+           class="group relative flex flex-col bg-cyber-card border border-cyber-border rounded-xl overflow-hidden hover:border-cyber-cyan/50 transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,240,255,0.1)]">
+            
+            <!-- Placeholder de Imagen (Reemplazar con imagen real cuando exista) -->
+            <div class="aspect-square w-full bg-cyber-surface flex items-center justify-center border-b border-cyber-border group-hover:bg-cyber-surface/80 transition-colors">
+                <span class="material-symbols-outlined text-4xl text-cyber-muted opacity-50">inventory_2</span>
+            </div>
+            
+            <!-- Info del Producto -->
+            <div class="p-4 flex flex-col flex-grow">
+                <h3 class="text-sm font-semibold text-cyber-text line-clamp-2 mb-2 group-hover:text-cyber-cyan transition-colors font-jakarta">
+                    {{ producto.nombre }}
+                </h3>
+                
+                <div class="mt-auto pt-3 border-t border-cyber-border/50 flex items-center justify-between">
+                    <span class="text-lg font-bold text-cyber-emerald font-outfit">
+                        ${{ producto.precio|floatformat:2 }}
+                    </span>
+                    <span class="text-[10px] text-cyber-muted uppercase tracking-wider font-medium">
+                        Ver detalle →
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Badge de Estado (Opcional) -->
+            <div class="absolute top-3 right-3">
+                <span class="px-2 py-0.5 rounded-md bg-cyber-surface/90 backdrop-blur-sm border border-cyber-border text-[10px] text-cyber-muted font-medium">
+                    Disponible
+                </span>
+            </div>
         </a>
+        
         {% empty %}
-        <p class="col-span-full text-gray-500 text-center py-12">No hay productos destacados disponibles.</p>
+        <!-- Estado Vacío Profesional -->
+        <div class="col-span-full flex flex-col items-center justify-center py-20 text-center">
+            <div class="w-16 h-16 rounded-2xl bg-cyber-surface border border-cyber-border flex items-center justify-center mb-4">
+                <span class="material-symbols-outlined text-3xl text-cyber-muted">search_off</span>
+            </div>
+            <h3 class="text-lg font-bold text-cyber-text mb-2">No se encontraron productos</h3>
+            <p class="text-sm text-cyber-muted max-w-md">
+                {% if busqueda %}
+                    Intenta con otros términos de búsqueda o revisa la ortografía.
+                {% else %}
+                    Aún no hay productos destacados disponibles. Vuelve pronto para descubrir nuevas ofertas verificadas.
+                {% endif %}
+            </p>
+        </div>
         {% endfor %}
     </div>
 </div>

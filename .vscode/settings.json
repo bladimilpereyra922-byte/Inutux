@@ -1,1 +1,6 @@
-{"python.terminal.useEnvFile": true}
+{
+    "python.defaultInterpreterPath": "./venv/Scripts/python.exe",
+    "editor.formatOnSave": true,
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000
+}

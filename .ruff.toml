@@ -1,0 +1,6 @@
+﻿[lint]
+ignore = ["I001"]
+
+[format]
+quote-style = "double"
+indent-style = "space"

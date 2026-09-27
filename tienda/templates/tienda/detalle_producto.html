@@ -1,14 +1,105 @@
 {% extends "base_cyber.html" %}
+
 {% block title %}{{ producto.nombre }} | UNITUX{% endblock %}
+
 {% block content %}
-<div class="min-h-screen flex items-center justify-center p-6">
-    <div class="max-w-4xl w-full bg-cyber-card rounded-2xl border border-white/10 p-8">
-        <h1 class="text-3xl font-outfit font-bold text-white mb-4">{{ producto.nombre }}</h1>
-        <p class="text-cyber-emerald text-2xl font-bold">${{ producto.precio }}</p>
-        <p class="text-cyber-muted mt-4">{{ producto.descripcion|default:"Sin descripción disponible." }}</p>
-        <a href="/" class="inline-block mt-6 px-6 py-3 bg-cyber-cyan text-black font-bold rounded-xl hover:bg-white transition-colors">
-            ← Volver al inicio
-        </a>
+<div class="max-w-[1360px] mx-auto px-4 py-8 min-h-screen">
+    
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-xs text-cyber-muted mb-8 font-jakarta">
+        <a href="/" class="hover:text-cyber-cyan transition-colors">Inicio</a>
+        <span class="material-symbols-outlined text-[10px]">chevron_right</span>
+        <a href="/catalogo/" class="hover:text-cyber-cyan transition-colors">Catálogo</a>
+        <span class="material-symbols-outlined text-[10px]">chevron_right</span>
+        <span class="text-cyber-text">{{ producto.nombre|truncatechars:30 }}</span>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        
+        <!-- Columna Izquierda: Imagen / Placeholder -->
+        <div class="relative group">
+            <div class="aspect-square w-full bg-cyber-card border border-cyber-border rounded-2xl flex items-center justify-center overflow-hidden relative">
+                {% if producto.imagen %}
+                    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                {% else %}
+                    <div class="flex flex-col items-center gap-4 opacity-40">
+                        <span class="material-symbols-outlined text-8xl text-cyber-muted">inventory_2</span>
+                        <span class="text-sm font-medium tracking-wider uppercase">Imagen no disponible</span>
+                    </div>
+                {% endif %}
+                
+                <!-- Badge de Seguridad -->
+                <div class="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-cyber-dark/80 backdrop-blur-md border border-cyber-emerald/30 shadow-[0_0_15px_rgba(5,231,119,0.1)]">
+                    <span class="material-symbols-outlined text-cyber-emerald text-base fill-1">verified_user</span>
+                    <span class="text-[11px] font-bold text-cyber-emerald tracking-wide uppercase">Verificado UNITUX</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Información y Acciones -->
+        <div class="flex flex-col justify-center">
+            
+            <!-- Título y Precio -->
+            <h1 class="text-3xl md:text-4xl font-bold text-cyber-text font-outfit leading-tight mb-4">
+                {{ producto.nombre }}
+            </h1>
+            
+            <div class="flex items-baseline gap-3 mb-6">
+                <span class="text-3xl font-bold text-cyber-emerald font-outfit">${{ producto.precio|floatformat:2 }}</span>
+                <span class="text-xs text-cyber-muted uppercase tracking-widest font-semibold">Precio final</span>
+            </div>
+
+            <!-- Descripción -->
+            <div class="prose prose-invert max-w-none mb-8">
+                <p class="text-cyber-muted leading-relaxed text-sm md:text-base font-jakarta">
+                    {{ producto.descripcion|default:"Este producto ha sido verificado técnicamente por nuestro equipo de especialistas UNITUX. Garantía de autenticidad y funcionamiento óptimo incluida." }}
+                </p>
+            </div>
+
+            <!-- Especificaciones Técnicas (Placeholder) -->
+            <div class="grid grid-cols-2 gap-4 mb-8 p-4 rounded-xl bg-cyber-surface/50 border border-cyber-border/50">
+                <div>
+                    <span class="block text-[10px] text-cyber-muted uppercase tracking-wider mb-1">Estado</span>
+                    <span class="text-sm text-cyber-text font-semibold">Nuevo / Verificado</span>
+                </div>
+                <div>
+                    <span class="block text-[10px] text-cyber-muted uppercase tracking-wider mb-1">Envío</span>
+                    <span class="text-sm text-cyber-text font-semibold">Express 24h Blindado</span>
+                </div>
+                <div>
+                    <span class="block text-[10px] text-cyber-muted uppercase tracking-wider mb-1">Custodia</span>
+                    <span class="text-sm text-cyber-emerald font-semibold">Fondos protegidos</span>
+                </div>
+                <div>
+                    <span class="block text-[10px] text-cyber-muted uppercase tracking-wider mb-1">SKU</span>
+                    <span class="text-sm text-cyber-text font-mono">UN-{{ producto.pk|default:"0000" }}</span>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="flex flex-col sm:flex-row gap-4 mt-auto">
+                <a href="{% url 'agregar_carrito' producto.pk %}" 
+                   class="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-cyber-cyan text-[#002022] font-bold hover:bg-[#7df9ff] hover:shadow-[0_0_20px_rgba(0,240,255,0.3)] transition-all active:scale-95">
+                    <span class="material-symbols-outlined">add_shopping_cart</span>
+                    Agregar al Carrito
+                </a>
+                
+                <button onclick="document.getElementById('support-modal').classList.remove('hidden')" 
+                        class="flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-cyber-surface border border-cyber-border text-cyber-text hover:border-cyber-cyan/40 hover:text-cyber-cyan transition-all active:scale-95">
+                    <span class="material-symbols-outlined">headset_mic</span>
+                    Consultar Experto
+                </button>
+            </div>
+
+            <!-- Nota de Seguridad -->
+            <div class="mt-6 flex items-start gap-3 p-3 rounded-lg bg-cyber-emerald/5 border border-cyber-emerald/10">
+                <span class="material-symbols-outlined text-cyber-emerald text-lg mt-0.5">shield_lock</span>
+                <p class="text-[11px] text-cyber-muted leading-relaxed">
+                    Tu compra está protegida por la Bóveda Criptográfica UNITUX. Los fondos solo se liberan al vendedor tras la confirmación técnica exitosa en 24 horas.
+                </p>
+            </div>
+
+        </div>
     </div>
 </div>
 {% endblock %}

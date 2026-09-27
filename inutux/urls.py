@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import include, path
 
+from api import views as api_views
 from carrito import views as carrito_views
 from pagos import views as pagos_views
 from proveedores import views as proveedores_views
@@ -12,40 +13,57 @@ from tienda import views as catalogo_views
 from usuarios import views as usuarios_views
 
 urlpatterns = [
-    path("api/", include("api.urls")),
     path("admin/", admin.site.urls),
-
-    # Inicio
+    # ✅ APIs para conectar con React (Notificaciones y Cupones)
+    path("api/notifications/", api_views.get_notifications, name="api_notifications"),
+    path("api/apply-promo/", api_views.apply_promo, name="api_apply_promo"),
+    path("api/", include("api.urls")),
+    # Inicio y Catálogo
     path("", catalogo_views.inicio, name="inicio"),
-
-    # Productos
-    path("producto/<int:pk>/", catalogo_views.detalle_producto, name="detalle"),
-
-    # Catálogo
     path("catalogo/", catalogo_views.inicio, name="catalogo"),
-
+    path("producto/<int:pk>/", catalogo_views.detalle_producto, name="detalle"),
     # Carrito
     path("carrito/", carrito_views.ver_carrito, name="carrito"),
-    path("carrito/agregar/<int:pk>/", carrito_views.agregar_carrito, name="agregar_carrito"),
-    path("carrito/eliminar/<int:pk>/", carrito_views.eliminar_carrito, name="eliminar_carrito"),
-
+    path(
+        "carrito/agregar/<int:pk>/",
+        carrito_views.agregar_carrito,
+        name="agregar_carrito",
+    ),
+    path(
+        "carrito/eliminar/<int:pk>/",
+        carrito_views.eliminar_carrito,
+        name="eliminar_carrito",
+    ),
     # Usuarios (Ordenadas alfabéticamente por ruta)
     path("google-login/", usuarios_views.google_login, name="google_login"),
     path("login/", usuarios_views.login_view, name="login"),
     path("logout/", usuarios_views.logout_view, name="logout"),
+    # ⚠️ NOTA: Perfil debe apuntar a una vista real de perfil cuando se cree.
+    # Por ahora mantiene login_view para evitar 404, pero NO es lo ideal en producción.
     path("perfil/", usuarios_views.login_view, name="perfil"),
-    path("recuperar-password/", usuarios_views.recuperar_password, name="recuperar_password"),
+    path(
+        "recuperar-password/",
+        usuarios_views.recuperar_password,
+        name="recuperar_password",
+    ),
     path("registro/", usuarios_views.registro, name="registro"),
-    path("reset/<str:uidb64>/<str:token>/", usuarios_views.reset_password_confirm, name="reset_password_confirm"),
-
+    path(
+        "reset/<str:uidb64>/<str:token>/",
+        usuarios_views.reset_password_confirm,
+        name="reset_password_confirm",
+    ),
     # Proveedores / Mi Tienda
     path("proveedor/", proveedores_views.panel_proveedor, name="panel_proveedor"),
-    path("proveedor/registro/", proveedores_views.registro_proveedor, name="registro_proveedor"),
-
+    path(
+        "proveedor/registro/",
+        proveedores_views.registro_proveedor,
+        name="registro_proveedor",
+    ),
     # Soporte IA
     path("soporte/", soporte_views.chat_soporte, name="chat_soporte"),
-    path("soporte-ia/", lambda r: JsonResponse({"status": "ok"}), name="soporte_ia_api"),
-
+    path(
+        "soporte-ia/", lambda r: JsonResponse({"status": "ok"}), name="soporte_ia_api"
+    ),
     # Pago
     path("pago/", pagos_views.pago, name="pago"),
 ]

@@ -399,37 +399,42 @@
         }
     </script>
     
-    <!-- ✅ FIREBASE AUTH SCRIPT (Solución definitiva para Google Login) -->
+    <!-- ✅ FIREBASE AUTH SCRIPT CORREGIDO -->
     {% block extra_scripts %}
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script>
-        // Configuración de Firebase (REEMPLAZAR CON TUS DATOS REALES DE FIREBASE CONSOLE)
+        // Configuración de Firebase SIN comillas extra ni escape HTML
         const firebaseConfig = {
-            apiKey: "{{ FIREBASE_API_KEY|default:'TU_API_KEY_AQUI' }}",
-            authDomain: "{{ FIREBASE_AUTH_DOMAIN|default:'tu-proyecto.firebaseapp.com' }}",
-            projectId: "{{ FIREBASE_PROJECT_ID|default:'tu-proyecto' }}",
+            apiKey: "{{ FIREBASE_API_KEY|default:'' }}",
+            authDomain: "{{ FIREBASE_AUTH_DOMAIN|default:'' }}",
+            projectId: "{{ FIREBASE_PROJECT_ID|default:'' }}"
         };
 
-        // Inicializar solo si no está inicializado
-        if (!firebase.apps.length) {
+        // Inicializar solo si hay credenciales válidas
+        if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "" && !firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
+        } else {
+            console.warn("⚠️ Firebase no configurado correctamente. Verifica variables de entorno.");
         }
 
         async function handleGoogleLogin() {
+            if (!firebase.auth) {
+                alert("Firebase Auth no está disponible");
+                return;
+            }
+            
             const provider = new firebase.auth.GoogleAuthProvider();
             
             try {
-                // Abrir popup y esperar resultado
                 const result = await firebase.auth().signInWithPopup(provider);
                 const token = await result.user.getIdToken();
                 
-                // Enviar token a Django vía fetch POST
                 const response = await fetch('/google-login/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken'),
+                        'X-CSRFToken': getCookie('csrftoken') || '',
                     },
                     body: JSON.stringify({ token: token }),
                 });
@@ -452,7 +457,6 @@
             }
         }
 
-        // Helper para obtener CSRF cookie si no hay tag en DOM
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
