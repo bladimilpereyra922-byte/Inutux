@@ -2,14 +2,17 @@ import os
 from pathlib import Path
 
 import dj_database_url
-from dotenv import load_dotenv
 
-# Cargar variables de entorno desde .env (solo en desarrollo local)
-load_dotenv()
+# Cargar .env solo si existe (desarrollo local). En producción Render ignora esto.
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv()
+except ImportError:
+    pass  # python-dotenv no está instalado (producción), usar variables de entorno nativas
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ✅ CORRECCIÓN CRÍTICA: Usar .get() con fallback seguro en lugar de acceso directo []
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
     "django-insecure-local-dev-fallback-key-change-in-production-immediately",
