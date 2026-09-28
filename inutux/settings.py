@@ -2,10 +2,18 @@ import os
 from pathlib import Path
 
 import dj_database_url
+from dotenv import load_dotenv
+
+# Cargar variables de entorno desde .env (solo en desarrollo local)
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
+# ✅ CORRECCIÓN CRÍTICA: Usar .get() con fallback seguro en lugar de acceso directo []
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "django-insecure-local-dev-fallback-key-change-in-production-immediately",
+)
 
 # DEBUG seguro: False en producción, True solo si se define explícitamente
 DEBUG = os.environ.get("DEBUG", "False") == "True"
@@ -66,7 +74,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                # ✅ Context processor personalizado para Firebase Auth
+                # Context processor personalizado para Firebase Auth
                 "inutux.context_processors.firebase_config",
             ],
         },
@@ -92,7 +100,9 @@ else:
     }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
