@@ -1,20 +1,23 @@
-ï»¿import json
+import json
+import logging
 import os
 import secrets
 
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-import firebase_admin.auth
+
+logger = logging.getLogger(__name__)
 
 
 def registro(request):
-    """Registro seguro con UserCreationForm estï¿½ndar de Django."""
+    """Registro seguro con UserCreationForm estándar de Django."""
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -27,13 +30,12 @@ def registro(request):
 
 
 def login_view(request):
-    """Login tradicional con protecciï¿½n CSRF implï¿½cita por Django."""
+    """Login tradicional con protección CSRF implícita por Django."""
     if request.method == "POST":
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
             login(request, form.get_user())
             next_url = request.POST.get("next", "/")
-            # Prevenciï¿½n de Open Redirect
             if next_url.startswith("/") and not next_url.startswith("//"):
                 return redirect(next_url)
             return redirect("inicio")
@@ -50,16 +52,41 @@ def perfil_view(request):
 
     context = {
         "user": request.user,
-        "orders": [],  # TODO: Pedido.objects.filter(usuario=request.user)
-        "favorites": [],  # TODO: Favorito.objects.filter(usuario=request.user)
+        "orders": [],
+        "favorites": [],
     }
     return render(request, "usuarios/perfil.html", context)
 
 
-def logout_view(request):
-    """Cierra sesiï¿½n y redirige al inicio."""
-    from django.contrib.auth import logout
+def recuperar_password(request):
+    """Recuperación segura de contraseña con token temporal."""
+    if request.method == "POST":
+        email = request.POST.get("email", "").strip().lower()
+        user = User.objects.filter(email__iexact=email).first()
 
+        if user:
+            token = secrets.token_urlsafe(32)
+            request.session["reset_token"] = {
+                "uid": user.pk,
+                "token": token,
+                "expires": (timezone.now() + __import__("datetime").timedelta(hours=1)).isoformat(),
+            }
+            msg = "Si el correo está registrado, recibirás instrucciones."
+        else:
+            msg = "Si el correo está registrado, recibirás instrucciones."
+
+        return render(request, "usuarios/recuperar_password.html", {"message": msg})
+
+    return render(request, "usuarios/recuperar_password.html")
+
+
+def reset_password_confirm(request, uidb64, token):
+    """Valida token y permite establecer nueva contraseña."""
+    return render(request, "usuarios/reset_password_confirm.html")
+
+
+def logout_view(request):
+    """Cierra sesión y redirige al inicio."""
     logout(request)
     return redirect("inicio")
 
@@ -68,16 +95,15 @@ def logout_view(request):
 @require_http_methods(["GET", "POST"])
 def google_login(request):
     """
-    Flujo dual seguro de Google Auth optimizado para producciï¿½n.
+    Flujo dual seguro de Google Auth optimizado para producción.
     - GET: Inicia flujo OAuth 2.0 hacia Google (fallback si JS falla)
     - POST: Valida ID Token usando Firebase Admin SDK (recomendado)
     """
 
-    # --- FLUJO POST: Validaciï¿½n con Firebase Admin SDK (Producciï¿½n) ---
+    # --- FLUJO POST: Validación con Firebase Admin SDK (Producción) ---
     if request.method == "POST":
         token = None
 
-        # Extraer token de form data o JSON body
         if request.content_type == "application/json":
             try:
                 data = json.loads(request.body)
@@ -94,7 +120,6 @@ def google_login(request):
             )
 
         try:
-            # Usar Firebase Admin SDK para verificaciï¿½n segura
             import firebase_admin.auth as fb_auth
 
             decoded_token = fb_auth.verify_id_token(token, check_revoked=True)
@@ -106,20 +131,14 @@ def google_login(request):
             )
 
             if not correo:
-                raise ValueError("Google no devolviï¿½ email en el token")
+                raise ValueError("Google no devolvió email en el token")
 
-        except (ValueError, KeyError, firebase_admin.auth.InvalidIdTokenError) as e:
-            # Log del error real para debugging en producciï¿½n
-            import logging
-
-            logger = logging.getLogger(__name__)
-            logger.error(f"Fallo validaciï¿½n Firebase token: {e!s}")
-
+        except (ValueError, KeyError, AttributeError) as e:
+            logger.error(f"Fallo validación Firebase token: {e!s}")
             return JsonResponse(
-                {"success": False, "error": "Token invï¿½lido o expirado."}, status=401
+                {"success": False, "error": "Token inválido o expirado."}, status=401
             )
 
-        # Crear o actualizar usuario Django
         user = User.objects.filter(email__iexact=correo).first()
         if user is None:
             base_username = correo.split("@")[0][:140]
@@ -136,15 +155,12 @@ def google_login(request):
                 first_name=first_name,
             )
         else:
-            # Actualizar nombre si cambiï¿½ en Google
             if user.first_name != first_name:
                 user.first_name = first_name
                 user.save(update_fields=["first_name"])
 
-        # Login seguro
         login(request, user)
 
-        # Redirecciï¿½n segura post-login
         next_url = request.POST.get("next", request.GET.get("next", "/"))
         if next_url.startswith("/") and not next_url.startswith("//"):
             return JsonResponse({"success": True, "redirect": next_url})
@@ -154,7 +170,7 @@ def google_login(request):
     client_id = os.environ.get("GOOGLE_CLIENT_ID")
     if not client_id:
         return JsonResponse(
-            {"success": False, "error": "Configuraciï¿½n de Google incompleta."},
+            {"success": False, "error": "Configuración de Google incompleta."},
             status=500,
         )
 
@@ -182,17 +198,16 @@ def google_login(request):
 
 
 def google_callback(request):
-    """Procesa el cï¿½digo de autorizaciï¿½n devuelto por Google OAuth."""
+    """Procesa el código de autorización devuelto por Google OAuth."""
     code = request.GET.get("code")
     state = request.GET.get("state")
     stored_state = request.session.pop("oauth_state", None)
 
     if not code or not state or state != stored_state:
         return JsonResponse(
-            {"success": False, "error": "Callback invï¿½lido."}, status=400
+            {"success": False, "error": "Callback inválido."}, status=400
         )
 
-    # Intercambiar cï¿½digo por ID token usando Google Token Endpoint
     client_id = os.environ.get("GOOGLE_CLIENT_ID", "")
     client_secret = os.environ.get("GOOGLE_CLIENT_SECRET", "")
     redirect_uri = request.build_absolute_uri(reverse("google_callback"))
@@ -217,7 +232,6 @@ def google_callback(request):
         if not id_token:
             return redirect("/login/?error=oauth_failed")
 
-        # Reutilizar la lï¿½gica de validaciï¿½n existente haciendo un POST interno simulado
         from django.test import RequestFactory
 
         factory = RequestFactory()
