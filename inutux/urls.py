@@ -1,8 +1,8 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.http import JsonResponse
 from django.urls import path
+from django.http import JsonResponse
 
 from api import views as api_views
 from carrito import views as carrito_views
@@ -14,7 +14,7 @@ from usuarios import views as usuarios_views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # ✅ APIs Centralizadas (Sin include redundante)
+    # ✅ APIs Centralizadas
     path("api/notifications/", api_views.get_notifications, name="api_notifications"),
     path("api/apply-promo/", api_views.apply_promo, name="api_apply_promo"),
     # Inicio y Catálogo
@@ -35,11 +35,12 @@ urlpatterns = [
     ),
     # Usuarios
     path("google-login/", usuarios_views.google_login, name="google_login"),
+    # ✅ CORRECCIÓN #2: Ruta faltante para el callback de Google OAuth
+    path("google-callback/", usuarios_views.google_callback, name="google_callback"),
     path("login/", usuarios_views.login_view, name="login"),
     path("logout/", usuarios_views.logout_view, name="logout"),
-    # ️ PERFIL: Mantiene login_view temporalmente.
-    # CRÍTICO: Debes crear 'usuarios_views.perfil_view' ASAP.
-    path("perfil/", usuarios_views.login_view, name="perfil"),
+    # ✅ CORRECCIÓN #1: Apuntar a la vista REAL de perfil, NO a login_view
+    path("perfil/", usuarios_views.perfil_view, name="perfil"),
     path(
         "recuperar-password/",
         usuarios_views.recuperar_password,
@@ -58,10 +59,10 @@ urlpatterns = [
         proveedores_views.registro_proveedor,
         name="registro_proveedor",
     ),
-    # Soporte IA (Agente UNITUX)
+    # Soporte IA
     path("soporte/", soporte_views.chat_soporte, name="chat_soporte"),
     path("soporte/api-chat/", soporte_views.api_chat_ia, name="api_chat_ia"),
-    # Legacy / Placeholder
+    # Legacy / Placeholder (Mantenido temporalmente)
     path(
         "soporte-ia/", lambda r: JsonResponse({"status": "ok"}), name="soporte_ia_api"
     ),

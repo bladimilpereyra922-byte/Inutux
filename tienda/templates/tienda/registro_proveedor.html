@@ -1,36 +1,72 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Registro de Proveedor - Inutux</title>
-    <style>
-        body{background:#08090f;color:#fff;font-family:Arial;display:flex;justify-content:center;align-items:center;min-height:100vh}
-        .tarjeta{background:#0d1117;border:1px solid #1db954;border-radius:12px;padding:40px;width:500px}
-        .logo{font-size:28px;font-weight:900;color:#00f5ff;text-align:center;margin-bottom:8px}
-        .slogan{color:#1db954;font-size:12px;text-align:center;margin-bottom:24px}
-        h2{text-align:center;margin-bottom:24px}
-        label{display:block;color:#4fc3f7;margin-bottom:4px;font-size:14px}
-        input,textarea{width:100%;padding:10px;background:#1a1a2e;border:1px solid #333;border-radius:8px;color:#fff;margin-bottom:16px}
-        .boton{width:100%;background:#1db954;color:#000;padding:12px;border:none;border-radius:8px;font-weight:700;font-size:16px;cursor:pointer}
-        a{color:#4fc3f7;display:block;text-align:center;margin-top:16px}
-    </style>
-</head>
-<body>
-    <div class="tarjeta">
-        <div class="logo">INUTUX</div>
-        <div class="slogan">Compras seguras y confiables</div>
-        <h2>Registrar mi tienda</h2>
-        <form method="post">
-            {% csrf_token %}
-            <label>Nombre de tu tienda</label>
-            <input type="text" name="nombre_tienda" required>
-            <label>Descripcion de tu tienda</label>
-            <textarea name="descripcion" rows="3"></textarea>
-            <label>Telefono de contacto</label>
-            <input type="text" name="telefono">
-            <button type="submit" class="boton">Registrar tienda</button>
-        </form>
-        <a href="/">Volver a la tienda</a>
+{% extends "base_cyber.html" %}
+
+{% block title %}Registro de Proveedor | UNITUX{% endblock %}
+
+{% block content %}
+<div class="max-w-[600px] mx-auto px-4 py-12 min-h-screen">
+    
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <div class="w-16 h-16 rounded-2xl bg-cyber-emerald/10 border border-cyber-emerald/30 flex items-center justify-center mx-auto mb-4">
+            <span class="material-symbols-outlined text-3xl text-cyber-emerald">storefront</span>
+        </div>
+        <h1 class="text-2xl font-bold text-cyber-text font-outfit">Vender en UNITUX</h1>
+        <p class="text-sm text-cyber-muted mt-2">Completa los datos de tu tienda para comenzar a vender con custodia blindada.</p>
     </div>
-</body>
-</html>
+
+    <!-- Mensajes de Error/Éxito -->
+    {% if messages %}
+    <div class="mb-6 space-y-2">
+        {% for message in messages %}
+        <div class="p-3 rounded-xl border text-sm flex items-start gap-2 {% if message.tags == 'error' %}bg-red-950/30 border-red-500/30 text-red-200{% else %}bg-emerald-950/30 border-emerald-500/30 text-emerald-200{% endif %}">
+            <span class="material-symbols-outlined text-lg mt-0.5">{% if message.tags == 'error' %}error{% else %}check_circle{% endif %}</span>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Formulario -->
+    <form method="post" class="space-y-5 bg-cyber-card p-6 rounded-2xl border border-cyber-border shadow-2xl">
+        {% csrf_token %}
+
+        <!-- Nombre de la Tienda -->
+        <div>
+            <label class="block text-xs font-semibold text-cyber-muted uppercase tracking-wider mb-2">Nombre de la Tienda *</label>
+            <input type="text" name="nombre_tienda" required minlength="3" 
+                   value="{{ nombre_tienda|default:'' }}"
+                   placeholder="Ej: TechCyber Store"
+                   class="w-full bg-cyber-surface border border-cyber-border rounded-xl px-4 py-3 text-cyber-text focus:border-cyber-cyan focus:ring-1 focus:ring-cyber-cyan outline-none transition-all placeholder:text-cyber-muted/50">
+        </div>
+
+        <!-- Teléfono -->
+        <div>
+            <label class="block text-xs font-semibold text-cyber-muted uppercase tracking-wider mb-2">Teléfono de Contacto *</label>
+            <input type="tel" name="telefono" required 
+                   value="{{ telefono|default:'' }}"
+                   placeholder="+57 300 123 4567"
+                   class="w-full bg-cyber-surface border border-cyber-border rounded-xl px-4 py-3 text-cyber-text focus:border-cyber-cyan focus:ring-1 focus:ring-cyber-cyan outline-none transition-all placeholder:text-cyber-muted/50">
+        </div>
+
+        <!-- Descripción -->
+        <div>
+            <label class="block text-xs font-semibold text-cyber-muted uppercase tracking-wider mb-2">Descripción de la Tienda</label>
+            <textarea name="descripcion" rows="4" 
+                      placeholder="Describe brevemente qué productos vendes y tu experiencia..."
+                      class="w-full bg-cyber-surface border border-cyber-border rounded-xl px-4 py-3 text-cyber-text focus:border-cyber-cyan focus:ring-1 focus:ring-cyber-cyan outline-none transition-all resize-none placeholder:text-cyber-muted/50">{{ descripcion|default:'' }}</textarea>
+        </div>
+
+        <!-- Botón Submit -->
+        <button type="submit" 
+                class="w-full py-3.5 rounded-xl bg-cyber-emerald text-[#003918] font-bold hover:bg-[#7dffa2] hover:shadow-[0_0_20px_rgba(5,231,119,0.3)] transition-all active:scale-95 flex items-center justify-center gap-2 mt-2">
+            <span class="material-symbols-outlined">rocket_launch</span>
+            Registrar Mi Tienda
+        </button>
+    </form>
+
+    <!-- Nota Legal -->
+    <p class="text-[11px] text-cyber-muted text-center mt-6 leading-relaxed">
+        Al registrarte aceptas los términos de UNITUX PRO. Tu cuenta será revisada en menos de 24h antes de activarse.
+    </p>
+</div>
+{% endblock %}
