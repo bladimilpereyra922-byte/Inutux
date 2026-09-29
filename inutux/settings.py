@@ -86,15 +86,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "inutux.wsgi.application"
 
-if os.environ.get("DATABASE_URL"):
+# Configuración de base de datos segura para Local (SQLite) y Producción (Postgres)
+if os.environ.get("DATABASE_URL") and "postgres" in os.environ["DATABASE_URL"]:
     DATABASES = {
         "default": dj_database_url.config(
-            default=os.environ.get("DATABASE_URL"),
+            default=os.environ["DATABASE_URL"],
             conn_max_age=600,
             ssl_require=True,
         )
     }
 else:
+    # Fallback seguro a SQLite para desarrollo local sin DATABASE_URL válido
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
