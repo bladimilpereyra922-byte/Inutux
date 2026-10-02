@@ -1,20 +1,13 @@
-from pathlib import Path
 import shutil
+from pathlib import Path
 
 
 class AutoFixEngine:
-
     def __init__(self, root=None):
 
         self.root = Path(root) if root else Path.cwd()
 
-        self.backup_dir = (
-            self.root
-            / "inspector"
-            / "security"
-            / "history"
-            / "backups"
-        )
+        self.backup_dir = self.root / "inspector" / "security" / "history" / "backups"
 
     def backup(self, file):
 
@@ -28,10 +21,7 @@ class AutoFixEngine:
             exist_ok=True,
         )
 
-        backup = (
-            self.backup_dir
-            / f"{file.name}.backup"
-        )
+        backup = self.backup_dir / f"{file.name}.backup"
 
         shutil.copy2(
             file,
@@ -50,7 +40,6 @@ class AutoFixEngine:
     def fix(self, finding):
 
         if not self.can_fix(finding):
-
             return {
                 "status": "skipped",
                 "message": "Corrección automática no autorizada.",
@@ -65,13 +54,9 @@ class AutoFixEngine:
 
         file = Path(file)
 
-        backup = (
-            self.backup_dir
-            / f"{file.name}.backup"
-        )
+        backup = self.backup_dir / f"{file.name}.backup"
 
         if not backup.exists():
-
             return {
                 "status": "error",
                 "message": "No existe respaldo.",

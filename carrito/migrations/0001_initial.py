@@ -6,31 +6,66 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('catalogo', '0001_initial'),
+        ("catalogo", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Carrito',
+            name="Carrito",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('creado', models.DateTimeField(auto_now_add=True)),
-                ('actualizado', models.DateTimeField(auto_now=True)),
-                ('usuario', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='carrito', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("creado", models.DateTimeField(auto_now_add=True)),
+                ("actualizado", models.DateTimeField(auto_now=True)),
+                (
+                    "usuario",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="carrito",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ItemCarrito',
+            name="ItemCarrito",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('cantidad', models.PositiveIntegerField(default=1)),
-                ('carrito', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='items', to='carrito.carrito')),
-                ('producto', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='catalogo.producto')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("cantidad", models.PositiveIntegerField(default=1)),
+                (
+                    "carrito",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="items",
+                        to="carrito.carrito",
+                    ),
+                ),
+                (
+                    "producto",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="catalogo.producto",
+                    ),
+                ),
             ],
         ),
     ]

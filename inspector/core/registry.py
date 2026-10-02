@@ -12,17 +12,10 @@ class Registry:
 
     def load(self):
         for _, module_name, _ in pkgutil.iter_modules(inspector.agents.__path__):
-
-            module = importlib.import_module(
-                f"inspector.agents.{module_name}"
-            )
+            module = importlib.import_module(f"inspector.agents.{module_name}")
 
             for _, cls in inspect.getmembers(module, inspect.isclass):
-
-                if (
-                    hasattr(cls, "name")
-                    and callable(getattr(cls, "run", None))
-                ):
+                if hasattr(cls, "name") and callable(getattr(cls, "run", None)):
                     self._agents[cls.name] = cls()
 
     def get(self, name):

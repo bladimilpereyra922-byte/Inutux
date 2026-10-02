@@ -5,7 +5,6 @@ from inspector.security.base import SecurityModule
 
 
 class SecretsModule(SecurityModule):
-
     name = "Secrets"
     description = "Detección de secretos, credenciales y tokens"
     risk = "CRITICAL"
@@ -21,27 +20,17 @@ class SecretsModule(SecurityModule):
     def load_rules(self):
 
         file = (
-            self.root /
-            "inspector" /
-            "security" /
-            "intelligence" /
-            "leaked_tokens.json"
+            self.root / "inspector" / "security" / "intelligence" / "leaked_tokens.json"
         )
 
         if file.exists():
-
-            self.rules = json.loads(
-                file.read_text(
-                    encoding="utf-8"
-                )
-            )
+            self.rules = json.loads(file.read_text(encoding="utf-8"))
 
     def scan(self):
 
         findings = []
 
         for py in self.python_files():
-
             content = self.read(py)
 
             if not content:
@@ -53,42 +42,26 @@ class SecretsModule(SecurityModule):
                 lines,
                 start=1,
             ):
-
                 for rule in self.rules:
-
                     try:
-
                         if re.search(
                             rule["pattern"],
                             line,
                         ):
-
                             findings.append(
-
                                 self.vulnerability(
-
                                     title=rule["name"],
-
                                     file=py,
-
                                     line=line_number,
-
                                     severity=rule["severity"],
-
                                     message=rule["message"],
-
                                     recommendation=rule["recommendation"],
-
                                     auto_fix=False,
-
                                     fix=None,
-
                                 )
-
                             )
 
                     except re.error:
-
                         continue
 
         return self.report(findings)

@@ -1,9 +1,10 @@
-﻿import json
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
-from django.utils import timezone
+import json
 from datetime import timedelta
+
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.utils import timezone
+from django.views.decorators.http import require_http_methods
 
 
 @login_required
@@ -45,19 +46,25 @@ def apply_promo(request):
         "UNITUX40": {"discount_percent": 0.40, "message": "¡40% OFF aplicado!"},
         "CYBER40": {"discount_percent": 0.40, "message": "¡40% OFF CYBER aplicado!"},
         "PRO10": {"discount_percent": 0.10, "message": "¡10% PRO aplicado!"},
-        "ENVIOGRATIS": {"discount_percent": 0.0, "message": "¡Envío Express bonificado!", "free_shipping": True},
+        "ENVIOGRATIS": {
+            "discount_percent": 0.0,
+            "message": "¡Envío Express bonificado!",
+            "free_shipping": True,
+        },
     }
 
     promo = VALID_PROMOS.get(code)
     if not promo:
-        return JsonResponse({
-            "valid": False,
-            "message": "Código no válido. Prueba UNITUX40 o CYBER40."
-        }, status=400)
+        return JsonResponse(
+            {"valid": False, "message": "Código no válido. Prueba UNITUX40 o CYBER40."},
+            status=400,
+        )
 
-    return JsonResponse({
-        "valid": True,
-        "discount_percent": promo["discount_percent"],
-        "message": promo["message"],
-        "free_shipping": promo.get("free_shipping", False),
-    })
+    return JsonResponse(
+        {
+            "valid": True,
+            "discount_percent": promo["discount_percent"],
+            "message": promo["message"],
+            "free_shipping": promo.get("free_shipping", False),
+        }
+    )

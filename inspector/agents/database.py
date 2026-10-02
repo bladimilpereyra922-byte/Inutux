@@ -1,10 +1,7 @@
-from pathlib import Path
-
 from inspector.core.base import AgentBase
 
 
 class DatabaseAgent(AgentBase):
-
     name = "database"
     description = "Auditoría de Base de Datos"
 
@@ -25,12 +22,8 @@ class DatabaseAgent(AgentBase):
         db_found = False
 
         for settings in settings_files:
-
             try:
-                content = settings.read_text(
-                    encoding="utf-8",
-                    errors="ignore"
-                )
+                content = settings.read_text(encoding="utf-8", errors="ignore")
 
                 if "DATABASES" in content:
                     db_found = True

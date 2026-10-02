@@ -1,4 +1,4 @@
-﻿import json
+import json
 import os
 
 import firebase_admin
@@ -56,7 +56,6 @@ def inicio(request):
             "busqueda": busqueda,
         },
     )
-    
 
 
 @login_required

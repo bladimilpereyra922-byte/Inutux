@@ -29,6 +29,4 @@ class ProveedorAdmin(admin.ModelAdmin):
         "slug": ("nombre_tienda",),
     }
 
-    ordering = (
-        "nombre_tienda",
-    )
+    ordering = ("nombre_tienda",)

@@ -1,5 +1,4 @@
 class RiskEngine:
-
     WEIGHTS = {
         "CRITICAL": 10,
         "HIGH": 5,
@@ -28,10 +27,7 @@ class RiskEngine:
         total_risk = 0
 
         for finding in findings:
-
-            severity = self.normalize_severity(
-                finding.get("severity")
-            )
+            severity = self.normalize_severity(finding.get("severity"))
 
             total_risk += self.WEIGHTS[severity]
 
@@ -62,10 +58,7 @@ class RiskEngine:
         }
 
         for finding in findings:
-
-            severity = self.normalize_severity(
-                finding.get("severity")
-            )
+            severity = self.normalize_severity(finding.get("severity"))
 
             stats[severity] += 1
 
@@ -76,7 +69,6 @@ class RiskEngine:
         modules = {}
 
         for finding in findings:
-
             module = finding.get(
                 "module",
                 "Unknown",
@@ -87,9 +79,7 @@ class RiskEngine:
                 [],
             )
 
-            modules[module].append(
-                finding
-            )
+            modules[module].append(finding)
 
         return modules
 
@@ -98,7 +88,6 @@ class RiskEngine:
         files = {}
 
         for finding in findings:
-
             file = finding.get(
                 "file",
                 "",
@@ -109,9 +98,7 @@ class RiskEngine:
                 [],
             )
 
-            files[file].append(
-                finding
-            )
+            files[file].append(finding)
 
         return files
 

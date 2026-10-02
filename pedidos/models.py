@@ -5,29 +5,29 @@ from django.utils import timezone
 
 
 class Moneda(models.TextChoices):
-    USD = 'USD', 'Dólar estadounidense'
-    DOP = 'DOP', 'Peso dominicano'
-    EUR = 'EUR', 'Euro'
-    MXN = 'MXN', 'Peso mexicano'
-    COP = 'COP', 'Peso colombiano'
+    USD = "USD", "Dólar estadounidense"
+    DOP = "DOP", "Peso dominicano"
+    EUR = "EUR", "Euro"
+    MXN = "MXN", "Peso mexicano"
+    COP = "COP", "Peso colombiano"
 
 
 class Pedido(models.Model):
     class Estado(models.TextChoices):
-        PENDIENTE_PAGO = 'pendiente_pago', 'Pendiente de pago'
-        PAGADO = 'pagado', 'Pagado'
-        EN_PROCESO = 'en_proceso', 'En proceso'
-        PARCIALMENTE_ENTREGADO = 'parcialmente_entregado', 'Parcialmente entregado'
-        ENTREGADO = 'entregado', 'Entregado'
-        CANCELADO = 'cancelado', 'Cancelado'
-        REEMBOLSADO = 'reembolsado', 'Reembolsado'
-        CERRADO = 'cerrado', 'Cerrado'
+        PENDIENTE_PAGO = "pendiente_pago", "Pendiente de pago"
+        PAGADO = "pagado", "Pagado"
+        EN_PROCESO = "en_proceso", "En proceso"
+        PARCIALMENTE_ENTREGADO = "parcialmente_entregado", "Parcialmente entregado"
+        ENTREGADO = "entregado", "Entregado"
+        CANCELADO = "cancelado", "Cancelado"
+        REEMBOLSADO = "reembolsado", "Reembolsado"
+        CERRADO = "cerrado", "Cerrado"
 
     codigo = models.CharField(max_length=32, unique=True)
     cliente = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
-        related_name='pedidos',
+        related_name="pedidos",
     )
     estado = models.CharField(
         max_length=30,
@@ -47,11 +47,15 @@ class Pedido(models.Model):
     motivo_cancelacion = models.TextField(blank=True)
 
     class Meta:
-        verbose_name = 'pedido'
-        verbose_name_plural = 'pedidos'
+        verbose_name = "pedido"
+        verbose_name_plural = "pedidos"
         indexes = [
-            models.Index(fields=['cliente', '-creado_en'], name='pedido_cliente_creado_idx'),
-            models.Index(fields=['estado', '-creado_en'], name='pedido_estado_creado_idx'),
+            models.Index(
+                fields=["cliente", "-creado_en"], name="pedido_cliente_creado_idx"
+            ),
+            models.Index(
+                fields=["estado", "-creado_en"], name="pedido_estado_creado_idx"
+            ),
         ]
         constraints = [
             models.CheckConstraint(
@@ -60,27 +64,27 @@ class Pedido(models.Model):
                 & Q(envio_total__gte=0)
                 & Q(impuesto_total__gte=0)
                 & Q(total__gte=0),
-                name='pedido_importes_no_negativos',
+                name="pedido_importes_no_negativos",
             ),
         ]
 
     def __str__(self):
-        return f'Pedido {self.codigo}'
+        return f"Pedido {self.codigo}"
 
     @classmethod
     def generar_codigo(cls):
         """Genera el siguiente código correlativo anual de un pedido."""
         anio = timezone.localdate().year
-        prefijo = f'UTX-{anio}-'
+        prefijo = f"UTX-{anio}-"
         ultimo_codigo = (
             cls.objects.select_for_update()
             .filter(codigo__startswith=prefijo)
-            .order_by('-codigo')
-            .values_list('codigo', flat=True)
+            .order_by("-codigo")
+            .values_list("codigo", flat=True)
             .first()
         )
-        consecutivo = int(ultimo_codigo.rsplit('-', 1)[-1]) + 1 if ultimo_codigo else 1
-        return f'{prefijo}{consecutivo:06d}'
+        consecutivo = int(ultimo_codigo.rsplit("-", 1)[-1]) + 1 if ultimo_codigo else 1
+        return f"{prefijo}{consecutivo:06d}"
 
     def save(self, *args, **kwargs):
         if self._state.adding and not self.codigo:
@@ -92,33 +96,33 @@ class Pedido(models.Model):
 
 class PedidoProveedor(models.Model):
     class Estado(models.TextChoices):
-        PENDIENTE_PAGO = 'pendiente_pago', 'Pendiente de pago'
-        PAGADO = 'pagado', 'Pagado'
-        CONFIRMADO = 'confirmado', 'Confirmado'
-        EN_PREPARACION = 'en_preparacion', 'En preparación'
-        ENVIADO = 'enviado', 'Enviado'
-        ENTREGADO = 'entregado', 'Entregado'
-        CANCELADO = 'cancelado', 'Cancelado'
-        REEMBOLSADO = 'reembolsado', 'Reembolsado'
-        INCIDENCIA = 'incidencia', 'Incidencia'
+        PENDIENTE_PAGO = "pendiente_pago", "Pendiente de pago"
+        PAGADO = "pagado", "Pagado"
+        CONFIRMADO = "confirmado", "Confirmado"
+        EN_PREPARACION = "en_preparacion", "En preparación"
+        ENVIADO = "enviado", "Enviado"
+        ENTREGADO = "entregado", "Entregado"
+        CANCELADO = "cancelado", "Cancelado"
+        REEMBOLSADO = "reembolsado", "Reembolsado"
+        INCIDENCIA = "incidencia", "Incidencia"
 
     class EstadoLogistico(models.TextChoices):
-        PENDIENTE = 'pendiente', 'Pendiente'
-        EN_PREPARACION = 'en_preparacion', 'En preparación'
-        LISTO_DESPACHO = 'listo_despacho', 'Listo para despacho'
-        EN_TRANSITO = 'en_transito', 'En tránsito'
-        ENTREGADO = 'entregado', 'Entregado'
-        DEVUELTO = 'devuelto', 'Devuelto'
+        PENDIENTE = "pendiente", "Pendiente"
+        EN_PREPARACION = "en_preparacion", "En preparación"
+        LISTO_DESPACHO = "listo_despacho", "Listo para despacho"
+        EN_TRANSITO = "en_transito", "En tránsito"
+        ENTREGADO = "entregado", "Entregado"
+        DEVUELTO = "devuelto", "Devuelto"
 
     pedido = models.ForeignKey(
         Pedido,
         on_delete=models.PROTECT,
-        related_name='pedidos_proveedor',
+        related_name="pedidos_proveedor",
     )
     proveedor = models.ForeignKey(
-        'proveedores.Proveedor',
+        "proveedores.Proveedor",
         on_delete=models.PROTECT,
-        related_name='pedidos_proveedor',
+        related_name="pedidos_proveedor",
     )
     codigo = models.CharField(max_length=40, unique=True)
     estado = models.CharField(
@@ -155,23 +159,25 @@ class PedidoProveedor(models.Model):
     motivo_cancelacion = models.TextField(blank=True)
 
     class Meta:
-        verbose_name = 'pedido de proveedor'
-        verbose_name_plural = 'pedidos de proveedores'
+        verbose_name = "pedido de proveedor"
+        verbose_name_plural = "pedidos de proveedores"
         indexes = [
             models.Index(
-                fields=['proveedor', 'estado', '-creado_en'],
-                name='pedprov_operacion_idx',
+                fields=["proveedor", "estado", "-creado_en"],
+                name="pedprov_operacion_idx",
             ),
-            models.Index(fields=['estado', '-creado_en'], name='pedprov_estado_creado_idx'),
             models.Index(
-                fields=['estado_logistico', '-creado_en'],
-                name='pedprov_logistica_idx',
+                fields=["estado", "-creado_en"], name="pedprov_estado_creado_idx"
+            ),
+            models.Index(
+                fields=["estado_logistico", "-creado_en"],
+                name="pedprov_logistica_idx",
             ),
         ]
         constraints = [
             models.UniqueConstraint(
-                fields=['pedido', 'proveedor'],
-                name='pedido_proveedor_unico',
+                fields=["pedido", "proveedor"],
+                name="pedido_proveedor_unico",
             ),
             models.CheckConstraint(
                 condition=Q(subtotal__gte=0)
@@ -184,26 +190,26 @@ class PedidoProveedor(models.Model):
                 & Q(monto_proveedor__gte=0)
                 & Q(costo_envio__gte=0)
                 & Q(costo_logistico__gte=0),
-                name='pedprov_importes_no_negativos',
+                name="pedprov_importes_no_negativos",
             ),
         ]
 
     def __str__(self):
-        return f'{self.codigo} · {self.proveedor.nombre_tienda}'
+        return f"{self.codigo} · {self.proveedor.nombre_tienda}"
 
 
 class ItemPedido(models.Model):
     pedido_proveedor = models.ForeignKey(
         PedidoProveedor,
         on_delete=models.PROTECT,
-        related_name='items',
+        related_name="items",
     )
     producto = models.ForeignKey(
-        'catalogo.Producto',
+        "catalogo.Producto",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='items_pedido',
+        related_name="items_pedido",
     )
     producto_nombre = models.CharField(max_length=200)
     producto_descripcion = models.TextField(blank=True)
@@ -215,50 +221,61 @@ class ItemPedido(models.Model):
     creado_en = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = 'ítem de pedido'
-        verbose_name_plural = 'ítems de pedido'
+        verbose_name = "ítem de pedido"
+        verbose_name_plural = "ítems de pedido"
         indexes = [
-            models.Index(fields=['pedido_proveedor'], name='itemped_proveedor_idx'),
-            models.Index(fields=['producto', '-creado_en'], name='itemped_producto_creado_idx'),
+            models.Index(fields=["pedido_proveedor"], name="itemped_proveedor_idx"),
+            models.Index(
+                fields=["producto", "-creado_en"], name="itemped_producto_creado_idx"
+            ),
         ]
         constraints = [
-            models.CheckConstraint(condition=Q(cantidad__gt=0), name='itemped_cantidad_positiva'),
+            models.CheckConstraint(
+                condition=Q(cantidad__gt=0), name="itemped_cantidad_positiva"
+            ),
             models.CheckConstraint(
                 condition=Q(precio_unitario__gte=0) & Q(subtotal__gte=0),
-                name='itemped_importes_no_negativos',
+                name="itemped_importes_no_negativos",
             ),
         ]
 
     def __str__(self):
-        return f'{self.cantidad} × {self.producto_nombre}'
+        return f"{self.cantidad} × {self.producto_nombre}"
 
 
 class Pago(models.Model):
     class ProveedorPago(models.TextChoices):
-        PAYPAL = 'paypal', 'PayPal'
-        STRIPE = 'stripe', 'Stripe'
-        TRANSFERENCIA = 'transferencia', 'Transferencia'
-        WALLET = 'wallet', 'Wallet'
-        EFECTIVO = 'efectivo', 'Efectivo'
+        PAYPAL = "paypal", "PayPal"
+        STRIPE = "stripe", "Stripe"
+        TRANSFERENCIA = "transferencia", "Transferencia"
+        WALLET = "wallet", "Wallet"
+        EFECTIVO = "efectivo", "Efectivo"
 
     class Estado(models.TextChoices):
-        CREADO = 'creado', 'Creado'
-        PENDIENTE = 'pendiente', 'Pendiente'
-        AUTORIZADO = 'autorizado', 'Autorizado'
-        CAPTURADO = 'capturado', 'Capturado'
-        FALLIDO = 'fallido', 'Fallido'
-        CANCELADO = 'cancelado', 'Cancelado'
-        REEMBOLSADO = 'reembolsado', 'Reembolsado'
-        PARCIALMENTE_REEMBOLSADO = 'parcialmente_reembolsado', 'Parcialmente reembolsado'
+        CREADO = "creado", "Creado"
+        PENDIENTE = "pendiente", "Pendiente"
+        AUTORIZADO = "autorizado", "Autorizado"
+        CAPTURADO = "capturado", "Capturado"
+        FALLIDO = "fallido", "Fallido"
+        CANCELADO = "cancelado", "Cancelado"
+        REEMBOLSADO = "reembolsado", "Reembolsado"
+        PARCIALMENTE_REEMBOLSADO = (
+            "parcialmente_reembolsado",
+            "Parcialmente reembolsado",
+        )
 
-    pedido = models.ForeignKey(Pedido, on_delete=models.PROTECT, related_name='pagos')
+    pedido = models.ForeignKey(Pedido, on_delete=models.PROTECT, related_name="pagos")
     proveedor_pago = models.CharField(
         max_length=30,
         choices=ProveedorPago.choices,
         default=ProveedorPago.PAYPAL,
     )
-    estado = models.CharField(max_length=30, choices=Estado.choices, default=Estado.CREADO)
-    referencia_externa = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    estado = models.CharField(
+        max_length=30, choices=Estado.choices, default=Estado.CREADO
+    )
+    referencia_externa = models.CharField(
+        max_length=255, unique=True, null=True, blank=True
+    )
     monto = models.DecimalField(max_digits=12, decimal_places=2)
     moneda = models.CharField(max_length=3, choices=Moneda.choices, default=Moneda.USD)
     respuesta_proveedor = models.JSONField(null=True, blank=True)
@@ -266,28 +283,30 @@ class Pago(models.Model):
     confirmado_en = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        verbose_name = 'pago'
-        verbose_name_plural = 'pagos'
+        verbose_name = "pago"
+        verbose_name_plural = "pagos"
         indexes = [
-            models.Index(fields=['pedido', 'estado'], name='pago_pedido_estado_idx'),
+            models.Index(fields=["pedido", "estado"], name="pago_pedido_estado_idx"),
             models.Index(
-                fields=['proveedor_pago', 'estado', '-creado_en'],
-                name='pago_conciliacion_idx',
+                fields=["proveedor_pago", "estado", "-creado_en"],
+                name="pago_conciliacion_idx",
             ),
         ]
         constraints = [
-            models.CheckConstraint(condition=Q(monto__gte=0), name='pago_monto_no_negativo'),
+            models.CheckConstraint(
+                condition=Q(monto__gte=0), name="pago_monto_no_negativo"
+            ),
         ]
 
     def __str__(self):
-        return f'Pago {self.get_proveedor_pago_display()} · {self.pedido.codigo}'
+        return f"Pago {self.get_proveedor_pago_display()} · {self.pedido.codigo}"
 
 
 class DireccionPedido(models.Model):
     pedido = models.OneToOneField(
         Pedido,
         on_delete=models.PROTECT,
-        related_name='direccion_envio',
+        related_name="direccion_envio",
     )
     destinatario = models.CharField(max_length=200)
     telefono = models.CharField(max_length=30)
@@ -301,36 +320,38 @@ class DireccionPedido(models.Model):
     codigo_postal = models.CharField(max_length=30, blank=True)
     pais = models.CharField(max_length=2)
     latitud = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    longitud = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitud = models.DecimalField(
+        max_digits=9, decimal_places=6, null=True, blank=True
+    )
     referencia = models.TextField(blank=True)
     creado_en = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = 'dirección de pedido'
-        verbose_name_plural = 'direcciones de pedido'
+        verbose_name = "dirección de pedido"
+        verbose_name_plural = "direcciones de pedido"
 
     def __str__(self):
-        return f'{self.pedido.codigo} · {self.destinatario}'
+        return f"{self.pedido.codigo} · {self.destinatario}"
 
 
 class EventoPedido(models.Model):
     class Tipo(models.TextChoices):
-        CAMBIO_ESTADO = 'cambio_estado', 'Cambio de estado'
-        PAGO = 'pago', 'Pago'
-        SISTEMA = 'sistema', 'Sistema'
-        NOTA = 'nota', 'Nota'
+        CAMBIO_ESTADO = "cambio_estado", "Cambio de estado"
+        PAGO = "pago", "Pago"
+        SISTEMA = "sistema", "Sistema"
+        NOTA = "nota", "Nota"
 
     pedido_proveedor = models.ForeignKey(
         PedidoProveedor,
         on_delete=models.PROTECT,
-        related_name='eventos',
+        related_name="eventos",
     )
     actor = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='eventos_pedido',
+        related_name="eventos_pedido",
     )
     tipo = models.CharField(max_length=30, choices=Tipo.choices, default=Tipo.SISTEMA)
     estado_anterior = models.CharField(max_length=30, blank=True)
@@ -339,14 +360,14 @@ class EventoPedido(models.Model):
     creado_en = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = 'evento de pedido'
-        verbose_name_plural = 'eventos de pedido'
+        verbose_name = "evento de pedido"
+        verbose_name_plural = "eventos de pedido"
         indexes = [
             models.Index(
-                fields=['pedido_proveedor', '-creado_en'],
-                name='evento_pedprov_creado_idx',
+                fields=["pedido_proveedor", "-creado_en"],
+                name="evento_pedprov_creado_idx",
             ),
         ]
 
     def __str__(self):
-        return f'{self.get_tipo_display()} · {self.pedido_proveedor.codigo}'
+        return f"{self.get_tipo_display()} · {self.pedido_proveedor.codigo}"

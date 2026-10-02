@@ -2,7 +2,6 @@ from django.db import models
 
 
 class ProductoQuerySet(models.QuerySet):
-
     def activos(self):
         return self.filter(activo=True)
 
@@ -54,7 +53,6 @@ class ProductoQuerySet(models.QuerySet):
 
 
 class ProductoManager(models.Manager):
-
     def get_queryset(self):
         return ProductoQuerySet(
             self.model,

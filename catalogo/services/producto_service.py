@@ -1,16 +1,15 @@
 from django.db import transaction
 
-from catalogo.models import Producto
 from catalogo.events.producto_events import (
-    producto_creado,
     producto_actualizado,
-    producto_publicado,
+    producto_creado,
     producto_despublicado,
+    producto_publicado,
 )
+from catalogo.models import Producto
 
 
 class ProductoService:
-
     @staticmethod
     @transaction.atomic
     def crear(**datos):

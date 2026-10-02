@@ -2,11 +2,12 @@
 import logging
 import os
 import secrets
+from datetime import timedelta
 
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -63,7 +64,7 @@ def recuperar_password(request):
             request.session["reset_token"] = {
                 "uid": user.pk,
                 "token": token,
-                "expires": (timezone.now() + __import__("datetime").timedelta(hours=1)).isoformat(),
+                "expires": (timezone.now() + timedelta(hours=1)).isoformat(),
             }
             msg = "Si el correo esta registrado, recibiras instrucciones."
         else:
@@ -84,81 +85,71 @@ def logout_view(request):
 @csrf_exempt
 @require_http_methods(["GET", "POST"])
 def google_login(request):
-    if request.method == "POST":
-        token = None
-        if request.content_type == "application/json":
-            try:
-                data = json.loads(request.body)
-                token = data.get("token")
-            except json.JSONDecodeError:
-                pass
-        if not token:
-            token = request.POST.get("token") or request.GET.get("token")
-        if not token:
-            return JsonResponse({"success": False, "error": "Token no proporcionado."}, status=400)
-        try:
-            import firebase_admin.auth as fb_auth
-            decoded_token = fb_auth.verify_id_token(token, check_revoked=True)
-            correo = decoded_token.get("email", "").strip().lower()
-            display_name = decoded_token.get("name", "")
-            first_name = display_name.split()[0] if display_name else correo.split("@")[0]
-            if not correo:
-                raise ValueError("Google no devolvio email en el token")
-        except (ValueError, KeyError, AttributeError) as e:
-            logger.error(f"Fallo validacion Firebase token: {e!s}")
-            return JsonResponse({"success": False, "error": "Token invalido o expirado."}, status=401)
-        user = User.objects.filter(email__iexact=correo).first()
-        if user is None:
-            base_username = correo.split("@")[0][:140]
-            username = base_username
-            counter = 1
-            while User.objects.filter(username=username).exists():
-                suffix = f"-{counter}"
-                username = f"{base_username[: 140 - len(suffix)]}{suffix}"
-                counter += 1
-            user = User.objects.create_user(username=username, email=correo, first_name=first_name)
-        else:
-            if user.first_name != first_name:
-                user.first_name = first_name
-                user.save(update_fields=["first_name"])
+    """Procesa token de Firebase Auth y crea sesión Django."""
+    if request.method != "POST":
+        return JsonResponse({"error": "Metodo no permitido"}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        id_token = data.get("token")
+
+        if not id_token:
+            return JsonResponse({"error": "Token no proporcionado"}, status=400)
+
+        import firebase_admin.auth as fb_auth
+        from firebase_admin.exceptions import FirebaseError
+
+        decoded_token = fb_auth.verify_id_token(id_token, check_revoked=True)
+        firebase_uid = decoded_token["uid"]
+        email = decoded_token.get("email", "")
+        name = decoded_token.get("name", email.split("@")[0])
+
+        user, created = User.objects.get_or_create(
+            username=firebase_uid,
+            defaults={"email": email, "first_name": name},
+        )
+
+        if not created and (user.email != email or user.first_name != name):
+            user.email = email
+            user.first_name = name
+            user.save(update_fields=["email", "first_name"])
+
         login(request, user)
-        next_url = request.POST.get("next", request.GET.get("next", "/"))
-        if next_url.startswith("/") and not next_url.startswith("//"):
-            return JsonResponse({"success": True, "redirect": next_url})
-        return JsonResponse({"success": True, "redirect": "/"})
-    client_id = os.environ.get("GOOGLE_CLIENT_ID")
-    if not client_id:
-        return JsonResponse({"success": False, "error": "Configuracion de Google incompleta."}, status=500)
-    redirect_uri = request.build_absolute_uri(reverse("google_callback"))
-    state = secrets.token_urlsafe(32)
-    nonce = secrets.token_urlsafe(32)
-    request.session["oauth_state"] = state
-    request.session["oauth_nonce"] = nonce
-    params = {
-        "client_id": client_id,
-        "redirect_uri": redirect_uri,
-        "response_type": "code",
-        "scope": "openid email profile",
-        "state": state,
-        "nonce": nonce,
-        "prompt": "consent select_account",
-    }
-    query_string = "&".join(f"{k}={v}" for k, v in params.items())
-    auth_url = f"https://accounts.google.com/o/oauth2/v2/auth?{query_string}"
-    return HttpResponseRedirect(auth_url)
+
+        return JsonResponse(
+            {
+                "success": True,
+                "redirect": "/perfil/",
+                "user": {
+                    "username": user.username,
+                    "email": user.email,
+                    "first_name": user.first_name,
+                },
+            }
+        )
+
+    except (ValueError, KeyError, FirebaseError) as e:
+        logger.error(f"Error en google_login: {e!s}")
+        return JsonResponse({"error": str(e), "success": False}, status=401)
 
 
 def google_callback(request):
     code = request.GET.get("code")
     state = request.GET.get("state")
     stored_state = request.session.pop("oauth_state", None)
+
     if not code or not state or state != stored_state:
-        return JsonResponse({"success": False, "error": "Callback invalido."}, status=400)
+        return JsonResponse(
+            {"success": False, "error": "Callback invalido."}, status=400
+        )
+
     client_id = os.environ.get("GOOGLE_CLIENT_ID", "")
     client_secret = os.environ.get("GOOGLE_CLIENT_SECRET", "")
     redirect_uri = request.build_absolute_uri(reverse("google_callback"))
+
     try:
         import requests
+
         resp = requests.post(
             "https://oauth2.googleapis.com/token",
             data={
@@ -172,18 +163,23 @@ def google_callback(request):
         )
         token_data = resp.json()
         id_token = token_data.get("id_token")
+
         if not id_token:
             return redirect("/login/?error=oauth_failed")
+
         from django.test import RequestFactory
+
         factory = RequestFactory()
         fake_request = factory.post("/google-login/", {"token": id_token})
         fake_request.session = request.session
         result = google_login(fake_request)
+
         if isinstance(result, JsonResponse):
             data = json.loads(result.content)
             if data.get("success"):
                 return redirect(data.get("redirect", "/"))
+
         return redirect("/login/?error=oauth_processing_failed")
+
     except (requests.exceptions.RequestException, ValueError, KeyError):
         return redirect("/login/?error=oauth_exchange_failed")
-    

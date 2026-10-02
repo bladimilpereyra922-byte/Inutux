@@ -3,15 +3,9 @@ from pathlib import Path
 
 
 class IntelligenceEngine:
-
     def __init__(self):
 
-        self.root = (
-            Path(__file__)
-            .resolve()
-            .parents[1]
-            / "intelligence"
-        )
+        self.root = Path(__file__).resolve().parents[1] / "intelligence"
 
         self.cache = {}
 
@@ -23,21 +17,14 @@ class IntelligenceEngine:
         file = self.root / f"{name}.json"
 
         if not file.exists():
-
             self.cache[name] = []
 
             return []
 
         try:
-
-            data = json.loads(
-                file.read_text(
-                    encoding="utf-8"
-                )
-            )
+            data = json.loads(file.read_text(encoding="utf-8"))
 
         except Exception:
-
             data = []
 
         self.cache[name] = data

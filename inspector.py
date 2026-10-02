@@ -9,8 +9,7 @@ def main():
     engine = Engine()
 
     parser = argparse.ArgumentParser(
-        prog="inspector",
-        description="Inspector CLI - Auditor Universal"
+        prog="inspector", description="Inspector CLI - Auditor Universal"
     )
 
     sub = parser.add_subparsers(dest="command")

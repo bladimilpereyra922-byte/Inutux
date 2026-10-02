@@ -4,7 +4,6 @@ from django.core.exceptions import ValidationError
 
 
 class ProductoValidator:
-
     @staticmethod
     def validar_precio(precio):
         if precio is None:
@@ -29,21 +28,15 @@ class ProductoValidator:
     @staticmethod
     def validar_stock(stock):
         if stock < 0:
-            raise ValidationError(
-                "El stock no puede ser negativo."
-            )
+            raise ValidationError("El stock no puede ser negativo.")
 
     @staticmethod
     def validar_sku(sku):
         if not sku:
-            raise ValidationError(
-                "El SKU es obligatorio."
-            )
+            raise ValidationError("El SKU es obligatorio.")
 
         if len(sku) < 4:
-            raise ValidationError(
-                "El SKU es demasiado corto."
-            )
+            raise ValidationError("El SKU es demasiado corto.")
 
     @classmethod
     def validar_producto(cls, producto):

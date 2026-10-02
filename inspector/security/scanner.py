@@ -44,11 +44,7 @@ class ProjectScanner:
     def scan(self):
 
         for file in self.root.rglob("*"):
-
-            if any(
-                part in self.EXCLUDED
-                for part in file.parts
-            ):
+            if any(part in self.EXCLUDED for part in file.parts):
                 continue
 
             if not file.is_file():

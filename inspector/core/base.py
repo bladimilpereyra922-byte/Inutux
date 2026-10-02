@@ -2,7 +2,6 @@ from pathlib import Path
 
 
 class AgentBase:
-
     name = "agent"
     description = "Base Agent"
 
@@ -42,9 +41,7 @@ class AgentBase:
         print("\n" + "=" * 60)
 
     def execute(self):
-        raise NotImplementedError(
-            "Cada agente debe implementar execute()."
-        )
+        raise NotImplementedError("Cada agente debe implementar execute().")
 
     def ok(self, message, info=None):
         return {

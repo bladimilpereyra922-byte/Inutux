@@ -12532,19 +12532,19 @@ Quiero agregar una regla para todo el proyecto:
 Por ejemplo, hoy tienes:
 
 ```python
-'tienda.Producto'
+"tienda.Producto"
 ```
 
 Quiero que, cuando migremos definitivamente, quede así:
 
 ```python
-'catalogo.Producto'
+"catalogo.Producto"
 ```
 
 Y después:
 
 ```python
-'proveedores.Proveedor'
+"proveedores.Proveedor"
 ```
 
 No quiero que dentro de dos años siga existiendo una referencia a `tienda` solo por compatibilidad.

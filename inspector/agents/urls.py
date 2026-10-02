@@ -1,10 +1,7 @@
-from pathlib import Path
-
 from inspector.core.base import AgentBase
 
 
 class UrlsAgent(AgentBase):
-
     name = "urls"
     description = "Auditoría de URLs Django"
 
@@ -36,19 +33,14 @@ class UrlsAgent(AgentBase):
         url_files = []
 
         for file in self.root.rglob("urls.py"):
-
             if any(part in self.EXCLUDED for part in file.parts):
                 continue
 
             # Solo revisar apps Django reales
             app_folder = file.parent
 
-            if (
-                file.name != "urls.py"
-                or (
-                    not (app_folder / "apps.py").exists()
-                    and file.parent.name != "inutux"
-                )
+            if file.name != "urls.py" or (
+                not (app_folder / "apps.py").exists() and file.parent.name != "inutux"
             ):
                 continue
 
@@ -66,35 +58,20 @@ class UrlsAgent(AgentBase):
         total_includes = 0
 
         for file in sorted(url_files):
-
             try:
+                content = file.read_text(encoding="utf-8", errors="ignore")
 
-                content = file.read_text(
-                    encoding="utf-8",
-                    errors="ignore"
-                )
-
-                paths = (
-                    content.count("path(")
-                    + content.count("re_path(")
-                )
+                paths = content.count("path(") + content.count("re_path(")
 
                 includes = content.count("include(")
 
                 total_paths += paths
                 total_includes += includes
 
-                info.append(
-                    f"{file.parent.name}: {paths} rutas"
-                )
+                info.append(f"{file.parent.name}: {paths} rutas")
 
-                if (
-                    paths > 0
-                    and "urlpatterns" not in content
-                ):
-                    warnings.append(
-                        f"{file.parent.name}: urlpatterns no encontrado"
-                    )
+                if paths > 0 and "urlpatterns" not in content:
+                    warnings.append(f"{file.parent.name}: urlpatterns no encontrado")
 
             except Exception as e:
                 errors.append(str(e))

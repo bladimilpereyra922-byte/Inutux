@@ -4,27 +4,33 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='ConfiguracionTienda',
+            name="ConfiguracionTienda",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('nombre', models.CharField(default='UNITUX', max_length=200)),
-                ('descripcion', models.TextField(blank=True)),
-                ('activo', models.BooleanField(default=True)),
-                ('creado_en', models.DateTimeField(auto_now_add=True)),
-                ('actualizado_en', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("nombre", models.CharField(default="UNITUX", max_length=200)),
+                ("descripcion", models.TextField(blank=True)),
+                ("activo", models.BooleanField(default=True)),
+                ("creado_en", models.DateTimeField(auto_now_add=True)),
+                ("actualizado_en", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'verbose_name': 'configuración de tienda',
-                'verbose_name_plural': 'configuraciones de tienda',
-                'ordering': ('-creado_en',),
+                "verbose_name": "configuración de tienda",
+                "verbose_name_plural": "configuraciones de tienda",
+                "ordering": ("-creado_en",),
             },
         ),
     ]

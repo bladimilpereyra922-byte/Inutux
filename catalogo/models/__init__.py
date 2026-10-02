@@ -1,19 +1,19 @@
 from .categoria import Categoria
-from .producto import Producto
-from .tag import Tag
 from .coleccion import Coleccion
-from .variante import VarianteProducto
+from .digital import ProductoDigital
 from .inventario import MovimientoInventario
 from .multimedia import MultimediaProducto
-from .digital import ProductoDigital
+from .producto import Producto
+from .tag import Tag
+from .variante import VarianteProducto
 
 __all__ = [
     "Categoria",
-    "Producto",
-    "Tag",
     "Coleccion",
-    "VarianteProducto",
     "MovimientoInventario",
     "MultimediaProducto",
+    "Producto",
     "ProductoDigital",
+    "Tag",
+    "VarianteProducto",
 ]

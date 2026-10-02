@@ -1,6 +1,5 @@
 from django.dispatch import Signal
 
-
 producto_creado = Signal()
 
 producto_actualizado = Signal()

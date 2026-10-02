@@ -1,10 +1,7 @@
-from pathlib import Path
-
 from inspector.core.base import AgentBase
 
 
 class DjangoAgent(AgentBase):
-
     name = "django"
     description = "Auditoría de Django"
 
@@ -20,7 +17,6 @@ class DjangoAgent(AgentBase):
         }
 
         for file, label in files.items():
-
             if (self.root / file).exists():
                 info.append(f"{label} encontrado")
             else:

@@ -3,7 +3,6 @@ from inspector.security.scanner import ProjectScanner
 
 
 class ScannerAgent(AgentBase):
-
     name = "scanner"
     description = "Escáner general del proyecto"
 

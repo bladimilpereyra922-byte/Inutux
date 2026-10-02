@@ -1,16 +1,13 @@
-from pathlib import Path
 import shutil
+from pathlib import Path
 
 
 class AutoFixEngine:
-
     def backup(self, file):
 
         file = Path(file)
 
-        backup = file.with_suffix(
-            file.suffix + ".bak"
-        )
+        backup = file.with_suffix(file.suffix + ".bak")
 
         shutil.copy2(file, backup)
 
@@ -20,12 +17,9 @@ class AutoFixEngine:
 
         file = Path(file)
 
-        backup = file.with_suffix(
-            file.suffix + ".bak"
-        )
+        backup = file.with_suffix(file.suffix + ".bak")
 
         if backup.exists():
-
             shutil.copy2(
                 backup,
                 file,
@@ -36,15 +30,10 @@ class AutoFixEngine:
         return False
 
     def replace(
-
         self,
-
         file,
-
         old,
-
         new,
-
     ):
 
         file = Path(file)

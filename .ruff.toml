@@ -1,6 +1,9 @@
 ﻿[lint]
-ignore = ["I001"]
+ignore = ["RUF012"]
 
-[format]
-quote-style = "double"
-indent-style = "space"
+[lint.per-file-ignores]
+"**/migrations/*.py" = ["ALL"]
+"**/admin.py" = ["RUF012"]
+"pedidos/models.py" = ["RUF012"]
+"proveedores/models.py" = ["RUF012"]
+"tienda/migrations/*.py" = ["ALL"]

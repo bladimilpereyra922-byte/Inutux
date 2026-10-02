@@ -6,11 +6,7 @@ def run():
 
     print("\n========== AUDITORÍA INUTUX ==========\n")
 
-    apps = [
-        p.name
-        for p in root.iterdir()
-        if p.is_dir() and (p / "models.py").exists()
-    ]
+    apps = [p.name for p in root.iterdir() if p.is_dir() and (p / "models.py").exists()]
 
     print(f"Apps encontradas: {len(apps)}")
     for app in apps:

@@ -2,13 +2,10 @@ from django.core.exceptions import PermissionDenied
 
 
 class ProductoPermission:
-
     @staticmethod
     def puede_crear(usuario):
         if not usuario.is_authenticated:
-            raise PermissionDenied(
-                "Debe iniciar sesión."
-            )
+            raise PermissionDenied("Debe iniciar sesión.")
 
         return True
 
@@ -23,9 +20,7 @@ class ProductoPermission:
         ):
             return True
 
-        raise PermissionDenied(
-            "No tiene permisos para editar este producto."
-        )
+        raise PermissionDenied("No tiene permisos para editar este producto.")
 
     @staticmethod
     def puede_eliminar(usuario, producto):
@@ -42,9 +37,7 @@ class ProductoPermission:
         if hasattr(usuario, "proveedor"):
             return True
 
-        raise PermissionDenied(
-            "No tiene permisos para publicar productos."
-        )
+        raise PermissionDenied("No tiene permisos para publicar productos.")
 
     @staticmethod
     def puede_ver_borradores(usuario):
@@ -54,6 +47,4 @@ class ProductoPermission:
         if hasattr(usuario, "proveedor"):
             return True
 
-        raise PermissionDenied(
-            "No tiene permisos para visualizar borradores."
-        )
+        raise PermissionDenied("No tiene permisos para visualizar borradores.")

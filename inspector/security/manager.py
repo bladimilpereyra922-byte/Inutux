@@ -2,16 +2,14 @@ import importlib
 import inspect
 import pkgutil
 
-import inspector.security.modules as modules
-
-from inspector.security.scanner import ProjectScanner
-from inspector.security.core.risk import RiskEngine
+from inspector.security import modules
 from inspector.security.core.autofix import AutoFixEngine
 from inspector.security.core.finder import Finder
+from inspector.security.core.risk import RiskEngine
+from inspector.security.scanner import ProjectScanner
 
 
 class SecurityManager:
-
     def __init__(self, root=None):
 
         self.scanner = ProjectScanner(root)
@@ -22,13 +20,9 @@ class SecurityManager:
 
         self.risk = RiskEngine()
 
-        self.autofix = AutoFixEngine(
-            self.scanner.root
-        )
+        self.autofix = AutoFixEngine(self.scanner.root)
 
-        self.finder = Finder(
-            self.project
-        )
+        self.finder = Finder(self.project)
 
         self.load()
 
@@ -36,10 +30,7 @@ class SecurityManager:
 
         self.modules.clear()
 
-        for _, module_name, _ in pkgutil.iter_modules(
-            modules.__path__
-        ):
-
+        for _, module_name, _ in pkgutil.iter_modules(modules.__path__):
             module = importlib.import_module(
                 f"inspector.security.modules.{module_name}"
             )
@@ -48,13 +39,11 @@ class SecurityManager:
                 module,
                 inspect.isclass,
             ):
-
                 if (
                     hasattr(cls, "scan")
                     and hasattr(cls, "name")
                     and cls.__module__ == module.__name__
                 ):
-
                     instance = cls()
 
                     instance.project = self.project
@@ -62,9 +51,7 @@ class SecurityManager:
                     instance.risk = self.risk
                     instance.autofix = self.autofix
 
-                    self.modules.append(
-                        instance
-                    )
+                    self.modules.append(instance)
 
     def run(self):
 
@@ -73,17 +60,12 @@ class SecurityManager:
         module_results = []
 
         for module in self.modules:
-
-            print(
-                f"[SECURITY] {module.name}"
-            )
+            print(f"[SECURITY] {module.name}")
 
             try:
-
                 result = module.scan()
 
                 if not isinstance(result, dict):
-
                     result = {
                         "module": module.name,
                         "status": "error",
@@ -92,8 +74,7 @@ class SecurityManager:
                                 "title": "Invalid module result",
                                 "severity": "CRITICAL",
                                 "message": (
-                                    "El módulo devolvió "
-                                    "un resultado inválido."
+                                    "El módulo devolvió un resultado inválido."
                                 ),
                             }
                         ],
@@ -114,9 +95,7 @@ class SecurityManager:
                     [],
                 )
 
-                module_results.append(
-                    result
-                )
+                module_results.append(result)
 
                 module_findings = result.get(
                     "findings",
@@ -127,25 +106,19 @@ class SecurityManager:
                     module_findings,
                     list,
                 ):
-
                     for finding in module_findings:
-
                         if isinstance(
                             finding,
                             dict,
                         ):
-
                             finding.setdefault(
                                 "module",
                                 module.name,
                             )
 
-                            findings.append(
-                                finding
-                            )
+                            findings.append(finding)
 
             except Exception as e:
-
                 module_results.append(
                     {
                         "module": module.name,
@@ -165,10 +138,6 @@ class SecurityManager:
             "status": "ok",
             "modules": module_results,
             "findings": findings,
-            "risk": self.risk.summary(
-                findings
-            ),
-            "total_findings": len(
-                findings
-            ),
+            "risk": self.risk.summary(findings),
+            "total_findings": len(findings),
         }

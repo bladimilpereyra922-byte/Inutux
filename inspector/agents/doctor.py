@@ -2,7 +2,6 @@ from inspector.core.base import AgentBase
 
 
 class DoctorAgent(AgentBase):
-
     name = "doctor"
     description = "Diagnóstico general del proyecto"
 

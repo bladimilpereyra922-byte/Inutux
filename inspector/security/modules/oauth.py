@@ -2,7 +2,6 @@ from inspector.security.core.module import SecurityModule
 
 
 class OAuthModule(SecurityModule):
-
     name = "OAuth"
     description = "Auditoría de OAuth"
     risk = "HIGH"
@@ -11,12 +10,7 @@ class OAuthModule(SecurityModule):
 
         findings = []
 
-        files = list(
-            dict.fromkeys(
-                self.settings_files()
-                + self.url_files()
-            )
-        )
+        files = list(dict.fromkeys(self.settings_files() + self.url_files()))
 
         checks = [
             (
@@ -30,21 +24,18 @@ class OAuthModule(SecurityModule):
         seen = set()
 
         for file in files:
-
             content = self.read(file)
 
             for number, line in enumerate(
                 content.splitlines(),
                 start=1,
             ):
-
                 for (
                     pattern,
                     message,
                     recommendation,
                     severity,
                 ) in checks:
-
                     if pattern.lower() not in line.lower():
                         continue
 

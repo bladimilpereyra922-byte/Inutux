@@ -3,8 +3,7 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser(
-        prog="inutux",
-        description="CLI oficial de Inutux Marketplace"
+        prog="inutux", description="CLI oficial de Inutux Marketplace"
     )
 
     sub = parser.add_subparsers(dest="command")
@@ -25,46 +24,57 @@ def main():
 
     if args.command == "audit":
         from tools.audit import run
+
         run()
 
     elif args.command == "doctor":
         from tools.doctor import run
+
         run()
 
     elif args.command == "migrations":
         from tools.migrations import run
+
         run()
 
     elif args.command == "models":
         from tools.models import run
+
         run()
 
     elif args.command == "admin":
         from tools.admin import run
+
         run()
 
     elif args.command == "urls":
         from tools.urls import run
+
         run()
 
     elif args.command == "security":
         from tools.security import run
+
         run()
 
     elif args.command == "performance":
         from tools.performance import run
+
         run()
 
     elif args.command == "marketplace":
         from tools.marketplace import run
+
         run()
 
     elif args.command == "database":
         from tools.database import run
+
         run()
 
     elif args.command == "report":
         from tools.report import run
+
         run()
 
     else:

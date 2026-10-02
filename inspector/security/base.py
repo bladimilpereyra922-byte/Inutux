@@ -2,7 +2,6 @@ from pathlib import Path
 
 
 class SecurityModule:
-
     name = "base"
     description = "Base Security Module"
     risk = "INFO"
@@ -44,70 +43,43 @@ class SecurityModule:
     def read(self, file):
 
         try:
-
             return file.read_text(
                 encoding="utf-8",
                 errors="ignore",
             )
 
         except Exception:
-
             return ""
 
     def vulnerability(
-
         self,
-
         title,
-
         file,
-
         message,
-
         recommendation,
-
         severity="MEDIUM",
-
         line=None,
-
         auto_fix=False,
-
         fix=None,
-
     ):
 
         return {
-
             "title": title,
-
             "file": str(file),
-
             "line": line,
-
             "severity": severity,
-
             "message": message,
-
             "recommendation": recommendation,
-
             "auto_fix": auto_fix,
-
             "fix": fix,
-
         }
 
     def report(self, findings):
 
         return {
-
             "module": self.name,
-
             "description": self.description,
-
             "risk": self.risk,
-
             "status": "warning" if findings else "ok",
-
             "findings": findings,
-
         }

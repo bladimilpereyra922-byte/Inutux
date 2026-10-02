@@ -1,8 +1,8 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
 from django.http import JsonResponse
+from django.urls import path
 
 from api import views as api_views
 from carrito import views as carrito_views
@@ -35,11 +35,9 @@ urlpatterns = [
     ),
     # Usuarios
     path("google-login/", usuarios_views.google_login, name="google_login"),
-    # ✅ CORRECCIÓN #2: Ruta faltante para el callback de Google OAuth
     path("google-callback/", usuarios_views.google_callback, name="google_callback"),
     path("login/", usuarios_views.login_view, name="login"),
     path("logout/", usuarios_views.logout_view, name="logout"),
-    # ✅ CORRECCIÓN #1: Apuntar a la vista REAL de perfil, NO a login_view
     path("perfil/", usuarios_views.perfil_view, name="perfil"),
     path(
         "recuperar-password/",

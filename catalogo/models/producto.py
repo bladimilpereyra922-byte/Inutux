@@ -1,9 +1,9 @@
 from django.db import models
 from django.utils.text import slugify
 
-from proveedores.models import Proveedor
 from catalogo.managers.producto_manager import ProductoManager
 from catalogo.validators.producto_validator import ProductoValidator
+from proveedores.models import Proveedor
 
 from .categoria import Categoria
 

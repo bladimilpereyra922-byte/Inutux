@@ -1,10 +1,7 @@
-from pathlib import Path
-
 from inspector.core.base import AgentBase
 
 
 class MigrationsAgent(AgentBase):
-
     name = "migrations"
     description = "Auditoría de Migraciones Django"
 
@@ -29,7 +26,6 @@ class MigrationsAgent(AgentBase):
         migration_dirs = []
 
         for folder in self.root.rglob("migrations"):
-
             if not folder.is_dir():
                 continue
 
@@ -49,22 +45,15 @@ class MigrationsAgent(AgentBase):
         total_files = 0
 
         for folder in migration_dirs:
-
-            files = [
-                f for f in folder.glob("*.py")
-                if f.name != "__init__.py"
-            ]
+            files = [f for f in folder.glob("*.py") if f.name != "__init__.py"]
 
             total_files += len(files)
 
-            info.append(
-                f"{folder.parent.name}: {len(files)} migraciones"
-            )
+            info.append(f"{folder.parent.name}: {len(files)} migraciones")
 
             numbers = []
 
             for file in files:
-
                 prefix = file.stem.split("_")[0]
 
                 if prefix.isdigit():
@@ -73,14 +62,9 @@ class MigrationsAgent(AgentBase):
             numbers.sort()
 
             if numbers:
+                expected = list(range(numbers[0], numbers[-1] + 1))
 
-                expected = list(
-                    range(numbers[0], numbers[-1] + 1)
-                )
-
-                missing = sorted(
-                    set(expected) - set(numbers)
-                )
+                missing = sorted(set(expected) - set(numbers))
 
                 if missing:
                     warnings.append(

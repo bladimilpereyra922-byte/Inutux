@@ -1,10 +1,7 @@
-from pathlib import Path
-
 from inspector.core.base import AgentBase
 
 
 class ModelsAgent(AgentBase):
-
     name = "models"
     description = "Auditoría de Modelos Django"
 
@@ -29,7 +26,6 @@ class ModelsAgent(AgentBase):
         model_files = []
 
         for file in self.root.rglob("models.py"):
-
             if any(part in self.EXCLUDED for part in file.parts):
                 continue
 
@@ -49,13 +45,8 @@ class ModelsAgent(AgentBase):
         many_to_many = 0
 
         for model in model_files:
-
             try:
-
-                content = model.read_text(
-                    encoding="utf-8",
-                    errors="ignore"
-                )
+                content = model.read_text(encoding="utf-8", errors="ignore")
 
                 classes = content.count("class ")
 
@@ -65,14 +56,9 @@ class ModelsAgent(AgentBase):
                 one_to_one += content.count("OneToOneField(")
                 many_to_many += content.count("ManyToManyField(")
 
-                info.append(
-                    f"{model.parent.name}: {classes} modelos"
-                )
+                info.append(f"{model.parent.name}: {classes} modelos")
 
-                if (
-                    classes > 0
-                    and "from django.db import models" not in content
-                ):
+                if classes > 0 and "from django.db import models" not in content:
                     warnings.append(
                         f"{model.parent.name}: falta importar django.db.models"
                     )

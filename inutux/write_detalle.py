@@ -1,4 +1,4 @@
-content = open('tienda/templates/tienda/detalle.html', 'w', encoding='utf-8')
+content = open("tienda/templates/tienda/detalle.html", "w", encoding="utf-8")
 content.write("""<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -34,4 +34,4 @@ header{background:#0d1117;padding:16px 40px;border-bottom:1px solid #1db954}
 </div></div>
 </body></html>""")
 content.close()
-print('Archivo creado exitosamente')
+print("Archivo creado exitosamente")

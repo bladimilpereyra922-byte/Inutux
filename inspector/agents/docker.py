@@ -6,7 +6,6 @@ from inspector.core.base import AgentBase
 
 
 class Agent(AgentBase):
-
     name = "docker"
     description = "Agente docker"
 

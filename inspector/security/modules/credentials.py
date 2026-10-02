@@ -4,7 +4,6 @@ from inspector.security.core.module import SecurityModule
 
 
 class CredentialsModule(SecurityModule):
-
     name = "Credentials"
     description = "Auditoría de contraseñas, credenciales y secretos"
     risk = "CRITICAL"
@@ -45,14 +44,12 @@ class CredentialsModule(SecurityModule):
         findings = []
 
         for file in self.python_files():
-
             content = self.read(file)
 
             for number, line in enumerate(
                 content.splitlines(),
                 start=1,
             ):
-
                 for (
                     pattern,
                     message,
@@ -60,7 +57,6 @@ class CredentialsModule(SecurityModule):
                     severity,
                     cwe,
                 ) in self.PATTERNS:
-
                     if not re.search(
                         pattern,
                         line,

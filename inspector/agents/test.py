@@ -6,7 +6,6 @@ from pathlib import Path
 
 
 class TestAgent:
-
     name = "test"
     description = "Agente test"
 
